@@ -21,6 +21,6 @@ export const mySkills = [
 ];
 
 export const about = {
-  name: 'Ramkrishna Swarnkar',
+  name: 'Sultan Alam',
   description: `I'm a Full Stack web developer and Open Source Contributor, I love building products to solve real-world problems. I'm specialized in building MVP's.`,
 };
