@@ -13,7 +13,7 @@ export default function About() {
       {/* About me */}
       <div className="mt-8 flex flex-col gap-4 md:flex-row">
         <Image
-          src="/assets/logo.png"
+          src="/assets/logo.jpg"
           alt="About"
           width={100}
           height={100}

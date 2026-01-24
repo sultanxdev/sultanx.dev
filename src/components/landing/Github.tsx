@@ -177,8 +177,8 @@ export default function Github() {
               <div className="w-full overflow-x-auto">
                 <ActivityCalendar
                   data={contributions}
-                  blockSize={12}
-                  blockMargin={4}
+                  blockSize={9}
+                  blockMargin={3}
                   fontSize={githubConfig.fontSize}
                   colorScheme={theme === 'dark' ? 'dark' : 'light'}
                   maxLevel={githubConfig.maxLevel}

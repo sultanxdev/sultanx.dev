@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Resend } from 'resend';
 import * as z from 'zod';
+import { AdminNotificationEmail } from '@/emails/admin-notification';
+import { VisitorConfirmationEmail } from '@/emails/visitor-confirmation';
 
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
@@ -123,6 +126,67 @@ ${data.message.trim()}
   }
 }
 
+async function sendEmails(data: {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+}): Promise<{ success: boolean; errors: string[] }> {
+  const resendApiKey = process.env.RESEND_API_KEY;
+  const adminEmail = process.env.ADMIN_EMAIL || 'sultanalamdev@gmail.com';
+
+  if (!resendApiKey) {
+    console.warn('RESEND_API_KEY not configured, skipping email notifications');
+    return { success: false, errors: ['RESEND_API_KEY not configured'] };
+  }
+
+  const resend = new Resend(resendApiKey);
+  const errors: string[] = [];
+  const submittedAt = new Date().toLocaleString('en-US', {
+    dateStyle: 'full',
+    timeStyle: 'short',
+  });
+
+  // Send admin notification email
+  try {
+    await resend.emails.send({
+      from: 'Portfolio Contact <onboarding@resend.dev>',
+      to: adminEmail,
+      subject: `New Contact Form Submission from ${data.name}`,
+      react: AdminNotificationEmail({
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        message: data.message,
+        submittedAt,
+      }),
+    });
+  } catch (error) {
+    console.error('Failed to send admin notification email:', error);
+    errors.push('admin notification');
+  }
+
+  // Send visitor confirmation email
+  try {
+    await resend.emails.send({
+      from: 'Sultan Alam <onboarding@resend.dev>',
+      to: data.email,
+      subject: 'Thank you for reaching out!',
+      react: VisitorConfirmationEmail({
+        name: data.name,
+      }),
+    });
+  } catch (error) {
+    console.error('Failed to send visitor confirmation email:', error);
+    errors.push('visitor confirmation');
+  }
+
+  return {
+    success: errors.length === 0,
+    errors,
+  };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const clientIP = getClientIP(request);
@@ -148,18 +212,29 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = contactSchema.parse(body);
 
+    // Send to both Telegram and Email
     const telegramSent = await sendToTelegram(validatedData);
+    const emailResult = await sendEmails(validatedData);
 
-    if (!telegramSent) {
+    // Consider it successful if at least one method worked
+    if (!telegramSent && !emailResult.success) {
       return NextResponse.json(
         { error: 'Failed to send message. Please try again.' },
         { status: 500 },
       );
     }
 
+    // Build success message
+    let successMessage = 'Message sent successfully!';
+    if (!telegramSent) {
+      successMessage += ' (Email sent, Telegram notification failed)';
+    } else if (!emailResult.success) {
+      successMessage += ' (Telegram sent, Email notification failed)';
+    }
+
     return NextResponse.json(
       {
-        message: 'Message sent successfully!',
+        message: successMessage,
         success: true,
       },
       {
