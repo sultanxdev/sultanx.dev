@@ -142,17 +142,10 @@ export async function POST(request: NextRequest) {
 
     // Prepare the request body for Gemini REST API
     const requestBody = {
+      system_instruction: {
+        parts: [{ text: systemPrompt }],
+      },
       contents: [
-        {
-          parts: [{ text: systemPrompt }],
-          role: 'user',
-        },
-        {
-          parts: [
-            { text: 'I understand. I will act as your portfolio assistant.' },
-          ],
-          role: 'model',
-        },
         // Add conversation history
         ...validatedData.history.map((msg) => ({
           ...msg,
@@ -168,14 +161,14 @@ export async function POST(request: NextRequest) {
         },
       ],
       generationConfig: {
-        maxOutputTokens: 512,
+        maxOutputTokens: 1000,
         temperature: 0.7,
         topP: 0.8,
         topK: 40,
       },
     };
 
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:streamGenerateContent?alt=sse&key=${apiKey}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${apiKey}`;
 
     const response = await fetch(geminiUrl, {
       method: 'POST',
@@ -186,6 +179,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      console.error('Gemini API Error details:', JSON.stringify(errorBody, null, 2));
+
+      if (response.status === 429) {
+        return NextResponse.json(
+          { error: 'AI Quota exceeded. Please try again in a few minutes.' },
+          { status: 429 },
+        );
+      }
+
+      if (response.status === 404) {
+        return NextResponse.json(
+          { error: 'Model not found. Please check your API key permissions.' },
+          { status: 404 },
+        );
+      }
+
       throw new Error(`Gemini API error: ${response.status}`);
     }
 
