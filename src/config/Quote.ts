@@ -1,12 +1,6 @@
 export const quotes = [
-    {
-    quote: `Seek knowledge from the cradle to the grave.`,
-    author: 'Islamic principle',
-  },
-  {
-    quote: `Knowledge without action is wasted computation.`,
-    author: 'Modern Islamic thought',
-  },
+   
+
   {
     quote: `Precision is part of faith.`,
     author: 'Prophet Muhammad (ﷺ)',
