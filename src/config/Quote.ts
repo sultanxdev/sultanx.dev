@@ -1,27 +1,36 @@
 export const quotes = [
-  {
-    quote: `A man who is master of patience is master of everything else.`,
-    author: 'George Savile',
+    {
+    quote: `Seek knowledge from the cradle to the grave.`,
+    author: 'Islamic principle',
   },
   {
-    quote: `You have a right to perform your prescribed duty, but you are not
-            entitled to the fruits of actions.`,
-    author: 'Bhagavad Gita',
+    quote: `Knowledge without action is wasted computation.`,
+    author: 'Modern Islamic thought',
   },
   {
-    quote: `Man is made by his belief. As he believes, so he is.`,
-    author: 'Bhagavad Gita',
+    quote: `Precision is part of faith.`,
+    author: 'Prophet Muhammad (ﷺ)',
   },
   {
-    quote: `Arise, awake, and stop not till the goal is reached.`,
-    author: 'Katha Upanishad',
+    quote: `Accountability exists even when no one is watching.`,
+    author: 'Qur’anic principle',
   },
   {
-    quote: `If the pain doesn't kill me, it will only make me stronger.`,
-    author: 'Sung Jin-Woo, Solo Leveling',
+    quote: `Every action is logged by intention.`,
+    author: 'Inspired by Hadith',
   },
   {
-    quote: `I’ll take a potato chip… AND EAT IT!`,
-    author: 'Light Yagami, Death Note',
+    quote: `Excellence is to perfect what you build.`,
+    author: 'Islamic concept of Ihsan',
   },
+  {
+    quote: `A believer does not repeat the same mistake twice.`,
+    author: 'Prophet Muhammad (ﷺ)',
+  },
+ 
+  {
+    quote: `Speak good or remain silent.`,
+    author: 'Prophet Muhammad (ﷺ)',
+  },
+
 ];
