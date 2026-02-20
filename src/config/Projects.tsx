@@ -18,10 +18,105 @@ import TailwindCss from '@/components/technologies/TailwindCss';
 import ThreeJs from '@/components/technologies/ThreeJs';
 import TypeScript from '@/components/technologies/TypeScript';
 import Vercel from '@/components/technologies/Vercel';
-import { Project } from '@/types/project';
 import Docker from '@/components/technologies/Docker';
+import { Project } from '@/types/project';
+
+
 export const projects: Project[] = [
+  // 🥇 1. InterviewMate — strongest signal
   {
+    title: 'InterviewMate',
+    description:
+      'Real-time AI interview simulation platform using WebSockets, streaming speech-to-text, and adaptive questioning for human-like interview practice.',
+    image: '/project/demo.png',
+    link: 'YOUR_LIVE_LINK',
+    technologies: [
+      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'Socket.IO', icon: <SocketIo key="socketio" /> },
+      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
+      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+    ],
+    github: 'YOUR_GITHUB_LINK',
+    live: 'YOUR_LIVE_LINK',
+    details: true,
+    projectDetailsPageSlug: '/projects/interviewmate',
+    isWorking: true,
+  },
+
+  // 🥈 2. Eventify — backend credibility
+  {
+    title: 'Eventify',
+    description:
+      'Event-driven microservices order processing system implementing Saga orchestration, transactional outbox, retries, and DLQ for fault-tolerant workflows.',
+    image: '/project/demo.png',
+    link: 'YOUR_LIVE_LINK',
+    technologies: [
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'Express', icon: <ExpressJs key="express" /> },
+    ],
+    github: 'YOUR_GITHUB_LINK',
+    live: 'YOUR_LIVE_LINK',
+    details: true,
+    projectDetailsPageSlug: '/projects/eventify',
+    isWorking: true,
+  },
+
+  // 🥉 3. Zendev — ambitious AI tooling
+  {
+    title: 'Zendev',
+    description:
+      'AI-powered platform that converts natural language prompts into deployable full-stack applications with live preview and GitHub integration.',
+    image: '/project/demo.png',
+    link: 'YOUR_LIVE_LINK',
+    technologies: [
+      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
+      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+    ],
+    github: 'YOUR_GITHUB_LINK',
+    live: 'YOUR_LIVE_LINK',
+    details: true,
+    projectDetailsPageSlug: '/projects/zendev',
+    isWorking: true,
+  },
+
+  // 4️⃣ Parsona — SaaS product signal
+  {
+    title: 'Parsona',
+    description:
+      'AI-powered personal branding SaaS that generates persona-aligned social posts, schedules content, and tracks engagement analytics.',
+    image: '/project/demo.png',
+    //video: 'https://ik.imagekit.io/hokb3mrdr/notesbuddy.mp4?tr=orig',
+    link: 'YOUR_LIVE_LINK',
+    technologies: [
+      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
+      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
+    ],
+    github: 'YOUR_GITHUB_LINK',
+    live: 'YOUR_LIVE_LINK',
+    details: true,
+    projectDetailsPageSlug: '/projects/parsona',
+    isWorking: true,
+  },
+
+  /* 
+{
     title: 'NotesBuddy',
     description:
       'A comprehensive study platform with notes, flashcards, quizzes, AI chatbot, and interactive learning tools',
@@ -43,25 +138,5 @@ export const projects: Project[] = [
     details: true,
     projectDetailsPageSlug: '/projects/notesbuddy',
     isWorking: true,
-  },
-  {
-    title: 'Eventify',
-    description:
-      'Event-driven microservices order processing system using Kafka, Saga orchestration, and Transactional Outbox for reliable distributed workflows',
-    image: '/project/eventify.png',
-    //video: 'https://ik.imagekit.io/hokb3mrdr/that-startup.mp4',
-    link: 'https://that-startup.ramx.in/',
-    technologies: [
-      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
-      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
-      { name: 'Sanity', icon: <Sanity key="sanity" /> },
-      { name: 'Vercel', icon: <Vercel key="vercel" /> },
-    ],
-    github: 'https://github.com/ramxcodes/that-startup',
-    live: 'https://that-startup.ramx.in/',
-    details: true,
-    projectDetailsPageSlug: '/projects/eventify',
-    isWorking: false,
-  },
+  }*/
 ];
