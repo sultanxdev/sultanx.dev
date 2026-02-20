@@ -1,0 +1,252 @@
+---
+title: 'InterviewMate — Real-Time AI Interview Platform'
+description: 'WebSocket-based AI interview simulator supporting live speech input, adaptive questioning, and automated evaluation reports.'
+image: '/project/interviewmate.png'
+technologies:
+  [
+    'Next.js',
+    'React',
+    'Node.js',
+    'Express',
+    'Socket.IO',
+    'MongoDB',
+    'Redis',
+    'JWT',
+    'Deepgram',
+    'Google Gemini',
+    'ElevenLabs',
+    'Razorpay',
+    'Tailwind CSS',
+    'Docker'
+  ]
+github: 'YOUR_GITHUB_LINK'
+live: 'YOUR_LIVE_LINK'
+timeline: '3–4 months'
+role: 'Full Stack Developer'
+team: 'Solo'
+status: 'In Progress'
+featured: true
+isPublished: true
+---
+
+# InterviewMate — Real-Time AI Interview Platform
+
+## Overview
+
+InterviewMate is a real-time AI interview simulation platform designed to replicate human-like technical and behavioral interviews using live speech input and adaptive questioning.
+
+Unlike traditional turn-based mock interview tools, the system processes streaming audio, performs partial transcription, and dynamically decides whether to interrupt, probe deeper, or proceed — creating a more realistic interview experience.
+
+The project focuses heavily on **low-latency streaming, real-time decision making, and fault-tolerant session management**.
+
+---
+
+## Problem Statement
+
+Most mock interview platforms suffer from major limitations:
+
+- strictly turn-based interactions  
+- no real-time speech handling  
+- generic follow-up questions  
+- lack of realistic interviewer behavior  
+- delayed or static feedback  
+
+As a result, candidates do not experience the pressure and flow of real interviews.
+
+InterviewMate was built to simulate **continuous, adaptive, voice-driven interviews** with near real-time responsiveness.
+
+---
+
+## Architecture Overview
+
+### High-Level Flow
+
+1. User starts interview session  
+2. Audio streamed via WebSocket  
+3. Deepgram performs streaming STT  
+4. Partial transcripts sent to AI decision engine  
+5. Gemini determines next interviewer action  
+6. ElevenLabs generates voice response  
+7. Session state persisted and analytics recorded  
+
+### Core Components
+
+- **Next.js Frontend** — live interview UI and dashboards  
+- **Node.js + Express** — API and session management  
+- **Socket.IO** — bidirectional real-time streaming  
+- **MongoDB** — users, sessions, token ledger  
+- **Redis (optional/queue)** — transient state and buffering  
+- **Deepgram** — streaming speech-to-text  
+- **Google Gemini** — adaptive questioning logic  
+- **ElevenLabs** — real-time text-to-speech  
+- **Razorpay** — token purchases  
+
+**Why WebSockets?**
+
+HTTP polling introduced unacceptable latency for live interviews.  
+Socket.IO enabled full-duplex streaming and sub-second interaction.
+
+---
+
+## Key Technical Decisions
+
+### Streaming-First Architecture
+
+**Problem:** Batch processing creates unnatural interview gaps.
+
+**Decision:** Designed pipeline around continuous audio streaming and partial transcripts.
+
+**Result:**
+
+- more natural conversation flow  
+- faster AI reaction time  
+- improved realism  
+
+---
+
+### AI Decision Engine on Partial Transcripts
+
+**Problem:** Waiting for final transcript increases response delay.
+
+**Decision:** Feed partial transcripts to Gemini for early intent detection.
+
+**Trade-off:**
+
+- faster reactions  
+- but requires handling transcript instability  
+
+---
+
+### Session State Machine
+
+Implemented explicit interview states:
+
+- initialized  
+- active  
+- paused  
+- completed  
+- failed  
+
+**Why it matters:**
+
+Real-time systems frequently face reconnects and partial failures.  
+State machine simplified recovery and token safety.
+
+---
+
+### Token-Based Monetization with Transactions
+
+**Problem:** Risk of token loss during failures.
+
+**Decision:** MongoDB transactions + token locking.
+
+**Result:**
+
+- safe deduction  
+- rollback on failure  
+- auditable usage trail  
+
+---
+
+## Challenges Faced
+
+### Maintaining Sub-Second Responsiveness
+
+Multiple AI services in the loop increased latency risk.
+
+**Solution:**
+
+- parallelized STT and decision pipeline  
+- used streaming transcripts  
+- optimized prompt size  
+
+---
+
+### Handling Dropped Connections
+
+Real-time interviews frequently broke during network instability.
+
+**Solution:**
+
+- implemented reconnect logic  
+- persisted session checkpoints  
+- added graceful session recovery  
+
+---
+
+### Partial Transcript Instability
+
+Streaming STT produces changing interim text.
+
+**Solution:**
+
+- introduced confidence thresholds  
+- delayed hard decisions until stable segments  
+- allowed AI to revise follow-ups  
+
+---
+
+## Performance Targets
+
+Designed system with the following goals:
+
+- STT latency: < 2s  
+- AI decision: < 1s  
+- TTS generation: < 1s  
+- end-to-end response: near real-time  
+
+*(Load testing and production metrics planned post-launch.)*
+
+---
+
+## What I Learned
+
+- designing real-time streaming systems  
+- managing WebSocket lifecycle reliably  
+- handling partial and unstable data streams  
+- building AI-in-the-loop decision pipelines  
+- implementing safe token-based monetization  
+- importance of failure-first thinking  
+
+---
+
+## Future Improvements
+
+Planned enhancements:
+
+- add OpenTelemetry tracing across WebSocket flow  
+- introduce Redis buffering for burst smoothing  
+- implement adaptive latency budgeting  
+- add interviewer personality modes  
+- run k6 load testing for concurrent sessions  
+- explore WebRTC for lower audio latency  
+
+---
+
+## Impact (Current Status)
+
+- End-to-end real-time interview flow working  
+- Adaptive questioning pipeline implemented  
+- Token billing and payments functional  
+- Analytics dashboard available  
+
+*(User-scale metrics will be added after public beta.)*
+
+---
+
+## My Role
+
+As the solo developer, I:
+
+- designed the real-time streaming architecture  
+- implemented WebSocket audio pipeline  
+- integrated Deepgram, Gemini, and ElevenLabs  
+- built the session state machine  
+- implemented token billing and Razorpay flow  
+- developed the full-stack dashboard experience  
+
+---
+
+## Key Takeaway
+
+InterviewMate gave me hands-on experience building a real-time, AI-driven system that combines streaming audio, adaptive decision making, and fault-tolerant session handling — highlighting the challenges of low-latency interactive platforms.

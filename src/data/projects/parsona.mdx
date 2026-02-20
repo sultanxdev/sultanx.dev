@@ -1,0 +1,213 @@
+---
+title: 'Parsona — AI Personal Branding Assistant'
+description: 'SaaS platform that helps professionals grow their LinkedIn and X presence using AI-powered content generation, scheduling, and persona-driven recommendations.'
+image: '/project/parsona.png'
+technologies:
+  [
+    'Next.js',
+    'TypeScript',
+    'React',
+    'Tailwind CSS',
+    'Shadcn UI',
+    'Node.js',
+    'MongoDB',
+    'Redis',
+    'BullMQ',
+    'OpenAI API',
+    'NextAuth',
+    'Stripe',
+    'PostHog',
+    'Docker'
+  ]
+github: 'YOUR_GITHUB_LINK'
+live: 'YOUR_LIVE_LINK'
+timeline: '4 months'
+role: 'Full Stack Developer'
+team: 'Solo'
+status: 'In Progress'
+featured: true
+isPublished: true
+---
+
+# Parsona — AI Personal Branding Assistant
+
+## Overview
+
+Parsona is a SaaS platform designed to help professionals and creators consistently grow their presence on LinkedIn and X. The platform generates persona-aligned posts, suggests relevant trends, and allows users to schedule and analyze their content performance from a single dashboard.
+
+The goal was to build an end-to-end system that combines AI generation, asynchronous job processing, and analytics into a practical real-world SaaS workflow.
+
+---
+
+## Problem Statement
+
+Many professionals struggle to maintain a consistent and high-quality online presence because:
+
+- content creation is time-consuming  
+- posts often lack consistency in tone  
+- identifying relevant trends is manual  
+- scheduling and tracking performance is fragmented  
+
+Simple AI text generators produce generic content but fail to adapt to a user’s professional identity.
+
+Parsona addresses this by maintaining a structured persona profile and using it to guide AI-generated content and recommendations.
+
+---
+
+## Architecture Overview
+
+### High-Level Flow
+
+1. User registers and sets up persona profile  
+2. Persona data stored in MongoDB  
+3. User generates post → OpenAI API  
+4. Generated drafts stored and editable  
+5. Scheduled posts processed via BullMQ workers  
+6. Engagement analytics collected and visualized  
+
+### Core Components
+
+- **Next.js Frontend** — dashboard and editor  
+- **Node.js API** — business logic and integrations  
+- **MongoDB** — user, persona, and post storage  
+- **Redis + BullMQ** — background job processing  
+- **OpenAI API** — content generation  
+- **Stripe** — subscription handling  
+
+**Why this architecture?**
+
+- separates real-time requests from background jobs  
+- supports future horizontal scaling  
+- keeps MVP development simple while production-aware  
+
+---
+
+## Key Technical Decisions
+
+### Queue-Based Scheduling (BullMQ)
+
+**Problem:** Scheduled publishing and heavy AI tasks can block request threads.
+
+**Decision:** Introduced Redis-backed BullMQ workers.
+
+**Result:**
+
+- non-blocking post generation  
+- reliable scheduled publishing  
+- retry support for transient failures  
+
+---
+
+### Persona-Driven Prompting
+
+**Problem:** Generic AI outputs lack user identity.
+
+**Decision:** Store structured persona JSON and inject into prompts.
+
+**Result:**
+
+- more consistent tone  
+- better relevance of generated posts  
+- foundation for future adaptive learning  
+
+---
+
+### Monolith-First Approach
+
+**Decision:** Started with modular monolith instead of microservices.
+
+**Reason:**
+
+- faster iteration for MVP  
+- reduced operational complexity  
+- easier local development  
+
+**Future path:** services can be extracted if scale demands.
+
+---
+
+## Challenges Faced
+
+### Maintaining Consistent AI Tone
+
+LLM outputs varied significantly across generations.
+
+**Solution:**
+
+- introduced structured persona fields  
+- refined system prompts  
+- added regeneration controls  
+
+---
+
+### Reliable Scheduled Publishing
+
+Background jobs initially failed silently during worker restarts.
+
+**Solution:**
+
+- implemented BullMQ retry policies  
+- added job status tracking  
+- improved logging for failures  
+
+---
+
+### Managing API Latency
+
+AI generation increased response times.
+
+**Solution:**
+
+- moved heavy work to background queues  
+- added loading states and draft persistence  
+
+---
+
+## What I Learned
+
+- designing async workflows with queues  
+- practical SaaS subscription handling  
+- prompt engineering for persona consistency  
+- trade-offs between monolith vs microservices  
+- importance of observability in background workers  
+
+---
+
+## Future Improvements
+
+Planned upgrades toward production readiness:
+
+- add OpenTelemetry tracing  
+- implement smarter trend ranking  
+- introduce caching layer for frequent generations  
+- add multi-account support for agencies  
+- run load testing and publish performance metrics  
+
+---
+
+## Impact (Current Status)
+
+- End-to-end SaaS workflow implemented  
+- Supports persona-based AI post generation  
+- Background scheduling system operational  
+- Subscription flow integrated  
+
+*(User growth metrics will be added after public launch.)*
+
+---
+
+## My Role
+
+As the solo developer, I:
+
+- designed the system architecture  
+- implemented full-stack features  
+- integrated OpenAI and Stripe  
+- built the background job infrastructure  
+- handled deployment and environment setup  
+
+---
+
+## Key Takeaway
+
+Parsona helped me gain hands-on experience building a real-world SaaS system that combines AI generation, asynchronous processing, and subscription workflows while balancing rapid MVP development with production-aware design.

@@ -1,0 +1,225 @@
+---
+title: 'Zendev.dev — AI MVP Generator'
+description: 'AI-powered platform that converts natural language prompts into deployable full-stack web applications with live preview and one-click deployment.'
+image: '/project/zendev.png'
+technologies:
+  [
+    'React',
+    'Next.js',
+    'Node.js',
+    'Express',
+    'MongoDB',
+    'JWT',
+    'WebContainer',
+    'Sandpack',
+    'Google Gemini',
+    'GitHub API',
+    'Razorpay',
+    'Tailwind CSS',
+    'Docker'
+  ]
+github: 'YOUR_GITHUB_LINK'
+live: 'YOUR_LIVE_LINK'
+timeline: 'Ongoing'
+role: 'Full Stack Developer'
+team: 'Solo'
+status: 'In Progress'
+featured: true
+isPublished: true
+---
+
+# Zendev.dev — AI MVP Generator
+
+## Overview
+
+Zendev.dev is an AI-powered developer platform that converts natural language prompts into functional full-stack web applications with live preview and one-click deployment.
+
+The system is designed to reduce the time required to go from idea to working MVP by automating boilerplate generation, project scaffolding, and deployment workflows.
+
+The project focuses on **AI orchestration, in-browser code execution, and automated deployment pipelines**.
+
+---
+
+## Problem Statement
+
+Developers and founders often lose significant time on repetitive setup tasks such as:
+
+- creating project boilerplate  
+- configuring authentication  
+- wiring database connections  
+- setting up deployments  
+
+Existing AI tools generate code snippets but struggle to produce **structured, runnable full-stack applications** or allow selective regeneration of modules.
+
+Zendev.dev explores how to automate this workflow end-to-end.
+
+---
+
+## Architecture Overview
+
+### High-Level Flow
+
+1. User submits natural language prompt  
+2. API validates and forwards request  
+3. AI service generates structured codebase  
+4. Preview service runs project in browser  
+5. User edits or regenerates modules  
+6. Deployment service pushes to Vercel/Render  
+7. Project saved in dashboard  
+
+### Core Components
+
+- **Next.js Frontend** — prompt builder and dashboard  
+- **Node.js API Gateway** — auth and orchestration  
+- **AI Generation Service (Gemini)** — code synthesis  
+- **Preview Service (WebContainer + Sandpack)** — in-browser execution  
+- **MongoDB** — users and projects  
+- **GitHub Integration** — repo creation and sync  
+- **Razorpay** — token-based billing  
+
+**Design Goal:** enable fast MVP generation while keeping architecture modular for future scaling.
+
+---
+
+## Key Technical Decisions
+
+### Structured Code Generation
+
+**Problem:** Raw LLM output is inconsistent for full projects.
+
+**Decision:** AI service returns a normalized file tree structure.
+
+**Result:**
+
+- predictable project scaffolding  
+- easier preview execution  
+- safer regeneration  
+
+---
+
+### In-Browser Execution with WebContainer
+
+**Why:**
+
+- eliminates local setup  
+- enables instant preview  
+- improves developer feedback loop  
+
+**Trade-off:** higher client resource usage.
+
+---
+
+### Module-Level Regeneration
+
+**Problem:** Full rebuilds are slow and destructive.
+
+**Decision:** allow selective regeneration (UI, backend, auth).
+
+**Benefit:**
+
+- faster iteration  
+- better developer control  
+- reduced compute cost  
+
+---
+
+### Token-Based Monetization
+
+Implemented usage-based model instead of pure subscription.
+
+**Reason:**
+
+- aligns cost with AI usage  
+- prevents free-tier abuse  
+- supports future scaling economics  
+
+---
+
+## Challenges Faced
+
+### Generating Consistent Project Structures
+
+LLM outputs varied between runs.
+
+**Solution:**
+
+- enforced schema-based output  
+- added post-processing validation  
+- introduced template fallbacks  
+
+---
+
+### Running Arbitrary Code Safely
+
+Executing generated code in-browser posed stability risks.
+
+**Solution:**
+
+- sandboxed execution via WebContainer  
+- limited resource usage  
+- added build error detection  
+
+---
+
+### Managing Long AI Generation Times
+
+Large prompts increased response latency.
+
+**Solution:**
+
+- async job handling  
+- progress indicators  
+- incremental streaming where possible  
+
+---
+
+## What I Learned
+
+- orchestrating multi-step AI pipelines  
+- handling untrusted generated code  
+- building in-browser execution environments  
+- designing token-based SaaS billing  
+- balancing flexibility vs reliability in AI systems  
+
+---
+
+## Future Improvements
+
+Planned upgrades:
+
+- add Redis queue for heavy builds  
+- implement template caching  
+- add OpenTelemetry tracing  
+- improve prompt-to-stack mapping  
+- support multi-framework output  
+- run load testing for concurrent builds  
+
+---
+
+## Current Status
+
+- Prompt-to-project pipeline working  
+- Live preview functional  
+- GitHub export integrated  
+- Token billing implemented  
+
+*(Scalability and performance testing in progress.)*
+
+---
+
+## My Role
+
+As the solo developer, I:
+
+- designed the end-to-end system architecture  
+- built AI orchestration pipeline  
+- implemented WebContainer preview flow  
+- integrated GitHub and deployment APIs  
+- implemented token-based billing with Razorpay  
+- developed full-stack dashboard  
+
+---
+
+## Key Takeaway
+
+Zendev.dev helped me explore the challenges of building AI-assisted developer tooling, particularly around structured code generation, sandboxed execution, and automated deployment workflows.

@@ -1,213 +1,222 @@
 ---
 title: 'Eventify — Event-Driven Order Processing System'
-description: 'Scalable event-driven microservices system with Saga orchestration and Kafka-based asynchronous workflows.'
+description: 'Backend-heavy microservices platform demonstrating Saga orchestration, transactional outbox, idempotent consumers, retries, and DLQ-based fault tolerance.'
 image: '/project/eventify.png'
 technologies:
   [
     'Node.js',
     'TypeScript',
-    'Apache Kafka',
     'PostgreSQL',
+    'Apache Kafka',
     'Docker',
     'Docker Compose',
+    'Express',
     'OpenAPI'
   ]
 github: 'YOUR_GITHUB_LINK'
 live: 'YOUR_LIVE_LINK'
-timeline: 'X Weeks'
+timeline: '6–8 weeks'
 role: 'Backend Developer'
 team: 'Solo'
-status: 'Ongoing'
+status: 'In Progress'
 featured: true
-challenges:
-  [
-    'Distributed Transaction Coordination',
-    'Reliable Event Delivery',
-    'Idempotent Consumer Design',
-    'Concurrent Order Processing'
-  ]
-learnings:
-  [
-    'Event-Driven Architecture',
-    'Saga Pattern',
-    'Transactional Outbox',
-    'Kafka Consumer Scaling'
-  ]
 isPublished: true
 ---
 
+# Eventify — Event-Driven Order Processing System
+
 ## Overview
 
-**Eventify** is a distributed order processing platform built to explore how modern e-commerce systems maintain consistency and reliability across microservices. The system uses an event-driven architecture powered by Apache Kafka to coordinate order, inventory, and payment workflows asynchronously.
+Eventify is a backend-focused microservices system built to demonstrate how modern distributed platforms reliably process orders across independent services such as inventory and payments.
 
-The primary goal was to design a backend that remains **fault-tolerant, scalable, and resilient under concurrent workloads**, avoiding the tight coupling and failure risks of synchronous service communication.
+The system uses an event-driven architecture with Saga orchestration and the Transactional Outbox pattern to maintain consistency under partial failures and duplicate message scenarios.
+
+The primary goal was to gain hands-on experience with **realistic distributed system failure modes and recovery strategies**.
 
 ---
 
 ## Problem Statement
 
-Traditional monolithic order systems struggle with:
+Traditional monolithic order systems struggle when:
 
-- tight service coupling  
-- poor fault isolation  
-- difficulty scaling individual components  
-- inconsistent state during partial failures  
+- services fail independently  
+- messages are duplicated  
+- partial failures leave data inconsistent  
+- synchronous chains increase latency and fragility  
 
-In high-throughput environments, synchronous request chains increase latency and amplify failure cascades.
+In real-world platforms, global transactions are impractical, so systems must rely on eventual consistency and reliable messaging.
 
-Eventify addresses this by adopting an **asynchronous event-driven microservices architecture** with Saga-based distributed transaction management.
+Eventify explores how to design such a system safely.
 
 ---
 
-## System Architecture
+## Architecture Overview
 
 ### High-Level Flow
 
-1. Order Service receives order request  
-2. Order Created event published to Kafka  
+1. Client creates order via API Gateway  
+2. Order Service persists order + outbox event  
 3. Inventory Service reserves stock  
 4. Payment Service processes payment  
-5. Saga orchestrator coordinates success/failure  
-6. Compensating transactions triggered on failure  
+5. Saga orchestrator determines final state  
+6. Compensation triggered on failure  
 
-### Key Components
+### Core Services
 
-- **API Gateway / Order Service**
-- **Inventory Service**
-- **Payment Service**
-- **Kafka Broker**
-- **Saga Orchestrator**
-- **Transactional Outbox Publisher**
-- **PostgreSQL databases per service**
+- API Gateway  
+- Auth Service  
+- Order Service (Saga orchestrator)  
+- Inventory Service  
+- Payment Service  
+- Outbox Publisher Worker  
+- Message Broker (Kafka)
 
-### Why Event-Driven?
+**Design Goal:** isolate failures while maintaining eventual consistency.
+
+---
+
+## Key Technical Decisions
+
+### Event-Driven Communication (Kafka)
+
+**Why:**
 
 - reduces temporal coupling  
+- enables replay capability  
 - improves failure isolation  
-- enables independent service scaling  
-- supports eventual consistency  
+
+**Trade-off:** increased system complexity and eventual consistency handling.
 
 ---
 
-## Key Engineering Decisions
+### Orchestrated Saga Pattern
 
-### Why Kafka over synchronous REST
+Used Order Service as central orchestrator.
 
-Synchronous REST between services introduces:
+**Benefits:**
 
-- cascading failures  
-- higher latency  
-- tight runtime coupling  
+- explicit failure handling  
+- easier debugging for learning system  
+- deterministic workflow  
 
-Kafka enables durable, asynchronous communication and consumer replay capability.
-
----
-
-### Why Saga over Two-Phase Commit
-
-2PC was avoided because:
-
-- poor scalability  
-- coordinator bottleneck  
-- not cloud-friendly  
-
-Saga provides eventual consistency with better fault tolerance for microservices.
+**Trade-off:** orchestrator can become coordination hotspot at scale.
 
 ---
 
-### Why Transactional Outbox
+### Transactional Outbox Pattern
 
-Dual writes (DB + Kafka) risk data inconsistency.
+Dual-write problem avoided by writing business data and events in the same DB transaction.
 
-The **Transactional Outbox pattern** ensures:
+**Result:**
 
-- atomic DB write  
-- reliable event publishing  
-- no lost messages  
-
----
-
-## Scalability & Reliability
-
-Eventify was designed with failure scenarios in mind.
-
-### Reliability Mechanisms
-
-- Idempotent Kafka consumers  
-- Retry with exponential backoff  
-- Dead Letter Queue (DLQ)  
-- Compensating transactions  
-- Service-level database isolation  
-
-### Concurrency Handling
-
-- asynchronous event processing  
-- consumer group scaling  
-- stateless service design  
-- message-driven workflow  
-
-### Horizontal Scaling Strategy
-
-Services can scale independently by:
-
-- increasing Kafka partitions  
-- adding consumer instances  
-- container-based deployment  
+- no lost events  
+- reliable publishing  
+- replay-safe event delivery  
 
 ---
 
-## Performance & Validation
+### Idempotent Consumers
 
-The system was validated using simulated concurrent workloads to verify:
+Each service maintains `processed_events` table.
 
-- correct Saga execution  
-- message durability  
-- consumer retry behavior  
-- system stability under parallel order flows  
+**Purpose:**
 
-> ⚠️ (Upgrade opportunity: add quantified load testing metrics such as req/sec, p95 latency, and consumer lag.)
+- safe retries  
+- duplicate message protection  
+- effectively-once processing semantics  
+
+---
+
+## Reliability & Fault Tolerance
+
+The system was designed with failure scenarios in mind.
+
+### Implemented Mechanisms
+
+- at-least-once delivery  
+- exponential retry with backoff  
+- dead letter queue (DLQ)  
+- idempotent event handling  
+- service-level database isolation  
+- correlation IDs for tracing  
+
+These mechanisms allow the workflow to recover from partial failures without corrupting state.
 
 ---
 
 ## Challenges Faced
 
-### Distributed Transaction Consistency
+### Distributed Transaction Coordination
 
-Coordinating inventory and payment without global transactions required careful Saga orchestration and compensating logic.
+Coordinating inventory and payment without global transactions required careful Saga state management.
 
-**Solution:** Implemented centralized Saga workflow with explicit failure handling.
+**Approach:** explicit state machine in Order Service with compensation logic.
 
 ---
 
 ### Reliable Event Publishing
 
-Ensuring no message loss during DB + Kafka writes was non-trivial.
+Ensuring DB write and event publish remain consistent.
 
-**Solution:** Implemented Transactional Outbox with background publisher workers.
-
----
-
-### Idempotent Consumer Handling
-
-Duplicate message delivery from Kafka required defensive consumer design.
-
-**Solution:** Added idempotency keys and safe retry logic.
+**Approach:** implemented Transactional Outbox with background publisher.
 
 ---
 
-## What I Would Improve Next
+### Handling Duplicate Messages
 
-If extended toward production scale:
+Kafka can deliver messages more than once.
 
-- add **Redis** for distributed caching  
-- implement **Prometheus + Grafana** observability  
-- introduce **OpenTelemetry tracing**  
-- add **rate limiting and circuit breakers**  
-- perform **k6 load testing with published metrics**  
-- evaluate **Kubernetes-based deployment**  
+**Approach:** added idempotency checks using processed event store.
 
 ---
 
-## Key Takeaways
+## What I Learned
 
-Eventify demonstrates how event-driven microservices combined with Saga orchestration can maintain consistency in distributed systems while remaining scalable and fault tolerant. The project strengthened my understanding of **asynchronous workflows, failure handling, and distributed system design trade-offs**.
+- practical event-driven architecture patterns  
+- Saga orchestration trade-offs  
+- outbox-based reliable messaging  
+- designing idempotent consumers  
+- thinking in failure-first distributed workflows  
+
+---
+
+## Future Improvements
+
+Planned enhancements:
+
+- add OpenTelemetry distributed tracing  
+- introduce Prometheus + Grafana metrics  
+- implement schema registry (Avro/JSON Schema)  
+- run k6 load testing with published metrics  
+- evaluate Kubernetes deployment  
+- add circuit breakers and rate limiting  
+
+---
+
+## Current Status
+
+- Core Saga workflow implemented  
+- Outbox publisher working  
+- Duplicate protection in place  
+- Docker Compose setup available  
+
+*(Load testing and production metrics planned.)*
+
+---
+
+## My Role
+
+As the solo developer, I:
+
+- designed the service boundaries  
+- implemented Saga orchestration  
+- built transactional outbox publisher  
+- implemented Kafka consumers and retries  
+- containerized services with Docker Compose  
+- added structured logging and correlation IDs  
+
+---
+
+## Key Takeaway
+
+Eventify strengthened my understanding of how distributed systems maintain consistency using asynchronous workflows, and highlighted the importance of idempotency, reliable messaging, and failure-aware design.
