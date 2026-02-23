@@ -21,7 +21,7 @@ export const VisitorConfirmationEmail: React.FC<
 > = ({ name }) => (
     <Html>
         <Head />
-        <Preview>Thank you for reaching out! I'll get back to you soon.</Preview>
+        <Preview>Thank you for reaching out! I&apos;ll get back to you soon.</Preview>
         <Body style={main}>
             <Container style={container}>
                 <Section style={header}>
@@ -32,7 +32,7 @@ export const VisitorConfirmationEmail: React.FC<
                     <Section style={message}>
                         <Text style={paragraph}>Hi {name},</Text>
                         <Text style={paragraph}>
-                            Thank you for getting in touch! I've received your message and
+                            Thank you for getting in touch! I&apos;ve received your message and
                             will get back to you as soon as possible.
                         </Text>
                         <Text style={paragraph}>
@@ -46,9 +46,9 @@ export const VisitorConfirmationEmail: React.FC<
                         <Text style={infoBoxTitle}>
                             <strong>💡 What happens next?</strong>
                         </Text>
-                        <Text style={listItem}>• I'll review your message carefully</Text>
+                        <Text style={listItem}>• I&apos;ll review your message carefully</Text>
                         <Text style={listItem}>
-                            • You'll receive a personalized response via email
+                            • You&apos;ll receive a personalized response via email
                         </Text>
                         <Text style={listItem}>• We can schedule a call if needed</Text>
                     </Section>

@@ -153,13 +153,15 @@ async function sendEmails(data: {
       from: 'Portfolio Contact <onboarding@resend.dev>',
       to: adminEmail,
       subject: `New Contact Form Submission from ${data.name}`,
-      react: AdminNotificationEmail({
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        message: data.message,
-        submittedAt,
-      }),
+      react: (
+        <AdminNotificationEmail
+          name={data.name}
+          email={data.email}
+          phone={data.phone}
+          message={data.message}
+          submittedAt={submittedAt}
+        />
+      ),
     });
   } catch (error) {
     console.error('Failed to send admin notification email:', error);
@@ -172,9 +174,7 @@ async function sendEmails(data: {
       from: 'Sultan Alam <onboarding@resend.dev>',
       to: data.email,
       subject: 'Thank you for reaching out!',
-      react: VisitorConfirmationEmail({
-        name: data.name,
-      }),
+      react: <VisitorConfirmationEmail name={data.name} />,
     });
   } catch (error) {
     console.error('Failed to send visitor confirmation email:', error);

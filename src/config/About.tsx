@@ -22,5 +22,5 @@ export const mySkills = [
 
 export const about = {
   name: 'Sultan Alam',
-  description: `I'm a Full Stack web developer and Open Source Contributor, I love building products to solve real-world problems. I'm specialized in building MVP's.`,
+  description: `I'm Full Stack Developer focused on building scalable, production-ready web applications. I specialize in developing MVPs quickly while maintaining clean architecture and strong UI quality. with a strong interest in performance-driven web systems.`,
 };

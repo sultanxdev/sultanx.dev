@@ -1,0 +1,26 @@
+$ next build
+   Γû▓ Next.js 15.3.8
+   - Environments: .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 5.0s
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/app/api/contact/route.ts:156:7
+Type error: Type 'ReactNode | Promise<ReactNode>' is not assignable to type 'ReactNode'.
+  Type 'Promise<ReactNode>' is not assignable to type 'ReactNode'.
+    Type 'Promise<ReactNode>' is not assignable to type 'ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<...>'.
+      Type 'Promise<ReactNode>' is not assignable to type 'Promise<AwaitedReactNode>'.
+        Type 'ReactNode' is not assignable to type 'AwaitedReactNode'.
+          Type 'Promise<AwaitedReactNode>' is not assignable to type 'AwaitedReactNode'.
+
+  154 |       to: adminEmail,
+  155 |       subject: `New Contact Form Submission from ${data.name}`,
+> 156 |       react: AdminNotificationEmail({
+      |       ^
+  157 |         name: data.name,
+  158 |         email: data.email,
+  159 |         phone: data.phone,
+Next.js build worker exited with code: 1 and signal: null
+error: script "build" exited with code 1

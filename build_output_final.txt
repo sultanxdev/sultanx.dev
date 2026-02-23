@@ -1,0 +1,79 @@
+$ next build
+   Γû▓ Next.js 15.3.8
+   - Environments: .env
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully in 7.0s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/24) ...
+   Generating static pages (6/24) 
+Error reading project case study zyvan: Error: Invalid frontmatter in zyvan.mdx
+    at x (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:20505)
+    at f (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:10955)
+Error reading project case study zyvan: Error: Invalid frontmatter in zyvan.mdx
+    at x (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:20505)
+    at <unknown> (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:21118)
+    at Array.map (<anonymous>)
+    at u (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:21104)
+    at f (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:11046)
+Error reading project case study zyvan: Error: Invalid frontmatter in zyvan.mdx
+    at x (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:20505)
+    at <unknown> (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:21118)
+    at Array.map (<anonymous>)
+    at u (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:21104)
+    at f (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:11046)
+Error reading project case study zyvan: Error: Invalid frontmatter in zyvan.mdx
+    at x (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:20505)
+    at <unknown> (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:21118)
+    at Array.map (<anonymous>)
+    at u (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:21104)
+    at f (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:11046)
+Error reading project case study zyvan: Error: Invalid frontmatter in zyvan.mdx
+    at x (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:20505)
+    at <unknown> (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:21118)
+    at Array.map (<anonymous>)
+    at u (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:21104)
+    at f (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:11046)
+Error reading project case study zyvan: Error: Invalid frontmatter in zyvan.mdx
+    at x (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:20505)
+    at Module.j (D:\All Projects\All SAAS Projects\sultanx.dev\.next\server\app\projects\[slug]\page.js:1:10500)
+   Generating static pages (12/24) 
+   Generating static pages (18/24) 
+ Γ£ô Generating static pages (24/24)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                    Size  First Load JS
+Γöî Γùï /                                       8.16 kB         168 kB
+Γö£ Γùï /_not-found                               986 B         103 kB
+Γö£ ╞Æ /api/chat                                 140 B         102 kB
+Γö£ ╞Æ /api/contact                              140 B         102 kB
+Γö£ Γùï /blog                                   5.34 kB         125 kB
+Γö£ ΓùÅ /blog/[slug]                            14.6 kB         158 kB
+Γö£   Γö£ /blog/javascript-for-frontend-part-1
+Γö£   Γö£ /blog/nextjs-data-fetching
+Γö£   Γöö /blog/routing-in-nextjs
+Γö£ Γùï /contact                                32.6 kB         143 kB
+Γö£ Γùï /gears                                  1.76 kB         116 kB
+Γö£ Γùï /journey                                 2.1 kB         134 kB
+Γö£ Γùï /journey/certificates                   3.22 kB         131 kB
+Γö£ Γùï /projects                               2.63 kB         150 kB
+Γö£ ΓùÅ /projects/[slug]                        4.27 kB         140 kB
+Γö£   Γö£ /projects/eventify
+Γö£   Γö£ /projects/interviewmate
+Γö£   Γö£ /projects/parsona
+Γö£   Γöö [+2 more paths]
+Γö£ Γùï /resume                                   652 B         111 kB
+Γö£ Γùï /setup                                    665 B         115 kB
+Γöö Γùï /work-experience                         2.2 kB         138 kB
++ First Load JS shared by all                102 kB
+  Γö£ chunks/4bd1b696-dca2a974fa29c73a.js     53.2 kB
+  Γö£ chunks/684-32b490115517ff82.js          46.6 kB
+  Γöö other shared chunks (total)             2.02 kB
+
+
+Γùï  (Static)   prerendered as static content
+ΓùÅ  (SSG)      prerendered as static HTML (uses generateStaticParams)
+╞Æ  (Dynamic)  server-rendered on demand
+

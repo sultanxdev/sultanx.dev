@@ -1,23 +1,13 @@
-import Appwrite from '@/components/technologies/Appwrite';
-import Bun from '@/components/technologies/Bun';
 import ExpressJs from '@/components/technologies/ExpressJs';
-import Github from '@/components/technologies/Github';
-import MDXIcon from '@/components/technologies/MDXIcon';
 import MongoDB from '@/components/technologies/MongoDB';
-import Motion from '@/components/technologies/Motion';
-import Netlify from '@/components/technologies/Netlify';
 import NextJs from '@/components/technologies/NextJs';
 import NodeJs from '@/components/technologies/NodeJs';
 import PostgreSQL from '@/components/technologies/PostgreSQL';
-import Prisma from '@/components/technologies/Prisma';
 import ReactIcon from '@/components/technologies/ReactIcon';
-import Sanity from '@/components/technologies/Sanity';
 import Shadcn from '@/components/technologies/Shadcn';
 import SocketIo from '@/components/technologies/SocketIo';
 import TailwindCss from '@/components/technologies/TailwindCss';
-import ThreeJs from '@/components/technologies/ThreeJs';
 import TypeScript from '@/components/technologies/TypeScript';
-import Vercel from '@/components/technologies/Vercel';
 import Docker from '@/components/technologies/Docker';
 import { Project } from '@/types/project';
 
@@ -25,7 +15,7 @@ import { Project } from '@/types/project';
 export const projects: Project[] = [
   // 🥇 1. InterviewMate — strongest signal
   {
-    title: 'InterviewMate',
+    title: 'Interviewmate',
     description:
       'Real-time AI interview simulation platform using WebSockets, streaming speech-to-text, and adaptive questioning for human-like interview practice.',
     image: '/project/demo.png',
@@ -65,7 +55,7 @@ export const projects: Project[] = [
     live: 'YOUR_LIVE_LINK',
     details: true,
     projectDetailsPageSlug: '/projects/eventify',
-    isWorking: true,
+    isWorking: false,
   },
 
   // 🥉 3. Zendev — ambitious AI tooling

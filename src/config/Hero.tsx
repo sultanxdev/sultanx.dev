@@ -89,10 +89,10 @@ export const heroConfig = {
   // Description Configuration
   description: {
     template:
-      'I build interactive web apps using {skills:0}, {skills:1}, {skills:2}, {skills:3} and {skills:4}. With a focus on <b>UI</b> design. Enthusiastic about <b>Three.js</b>, driven by a keen eye for design.',
+      'I build interactive web apps using {skills:0}, {skills:1}, {skills:2}, {skills:3} and {skills:4}. With a focus on clean architecture and polished <b>UI</b> design.',
   },
 
-  // Buttons Configuration
+  // Buttons Configuratio
   buttons: [
     {
       variant: 'outline',
