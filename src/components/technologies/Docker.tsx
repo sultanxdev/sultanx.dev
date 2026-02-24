@@ -1,5 +1,16 @@
-const Docker = () => {
-  return <span>Docker</span>;
-};
-
-export default Docker;
+export default function Docker() {
+  return (
+    <svg viewBox="0 0 128 128">
+      <path
+        fill="#2496ED"
+        d="M124.2 52.6c-2.5-1.7-8.4-2.3-12.5-1.7-.5-3.6-2.6-6.7-5.7-9-3.4-2.5-8.1-4-12.7-3.6-.7 0-1.1.6-1.1 1.2v7.5c0 .5.4 1 1 1.1 2.6.3 4.7 1.2 6.1 2.6 1.2 1.2 2 2.8 2.2 4.5H7.2c-1.6 0-2.9 1.3-2.9 2.9 0 9.2 4.5 17.3 12.6 22.6 7.1 4.7 16.5 7.2 26.5 7.2 21.4 0 38.7-12.1 43.1-29.4 4.5.7 10.3.2 14.2-2.6 3.1-2.2 5.4-5.8 6.4-10 .1-.5-.1-1-.5-1.3z"
+      />
+      <rect x="18" y="38" width="12" height="10" fill="#2496ED" />
+      <rect x="32" y="38" width="12" height="10" fill="#2496ED" />
+      <rect x="46" y="38" width="12" height="10" fill="#2496ED" />
+      <rect x="32" y="26" width="12" height="10" fill="#2496ED" />
+      <rect x="46" y="26" width="12" height="10" fill="#2496ED" />
+      <rect x="60" y="38" width="12" height="10" fill="#2496ED" />
+    </svg>
+  );
+}

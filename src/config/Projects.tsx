@@ -10,7 +10,15 @@ import TailwindCss from '@/components/technologies/TailwindCss';
 import TypeScript from '@/components/technologies/TypeScript';
 import Docker from '@/components/technologies/Docker';
 import { Project } from '@/types/project';
-
+import Mongoose from '@/components/technologies/Mongoose';
+import Prisma from '@/components/technologies/Prisma';
+import JavaScript from '@/components/technologies/JavaScript';
+import Vercel from '@/components/technologies/Vercel';
+import Render from '@/components/technologies/Render';
+import Kafka from '@/components/technologies/Kafka';
+import AWS from '@/components/technologies/AWS';
+import BullMQ from '@/components/technologies/BullMQ';
+import Redis from '@/components/technologies/Redis';
 
 export const projects: Project[] = [
   // 🥇 1. InterviewMate — strongest signal
@@ -21,19 +29,51 @@ export const projects: Project[] = [
     image: '/project/demo.png',
     link: 'YOUR_LIVE_LINK',
     technologies: [
-      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
       { name: 'React', icon: <ReactIcon key="react" /> },
       { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
-      { name: 'Socket.IO', icon: <SocketIo key="socketio" /> },
       { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
-      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
+      { name: 'Mongoose', icon: <Mongoose key="mongoose" /> },
+      { name: 'Socket.IO', icon: <SocketIo key="socketio" /> },
+      { name: 'Express.js', icon: <ExpressJs key="express" /> },
+      { name: 'JavaScript', icon: <JavaScript key="javascript" /> },
       { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
       { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'Vercel', icon: <Vercel key="vercel" /> },
+      { name: 'Render', icon: <Render key="render" /> },
+
     ],
-    github: 'YOUR_GITHUB_LINK',
-    live: 'YOUR_LIVE_LINK',
+    github: 'https://github.com/sultanxdev/interviewmate',
+    live: 'https://interviewmate.sultanx.dev',
     details: true,
     projectDetailsPageSlug: '/projects/interviewmate',
+    isWorking: true,
+  },
+   {
+    title: 'Parsona',
+    description:
+      'AI-powered personal branding SaaS that generates persona-aligned social posts, schedules content, and tracks engagement analytics.',
+    image: '/project/demo.png',
+    //video: 'https://ik.imagekit.io/hokb3mrdr/notesbuddy.mp4?tr=orig',
+    link: 'https://parsona.sultanx.dev',  
+    technologies: [
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'Express.js', icon: <ExpressJs key="express" /> },
+      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
+      { name: 'Mongoose', icon: <Mongoose key="mongoose" /> },  
+      { name: 'JavaScript', icon: <JavaScript key="javascript" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'Vercel', icon: <Vercel key="vercel" /> },
+      { name: 'Render', icon: <Render key="render" /> },
+
+    ],
+    github: 'https://github.com/sultanxdev/parsona',
+    live: 'https://parsona.sultanx.dev',
+    details: true,
+    projectDetailsPageSlug: '/projects/parsona',
     isWorking: true,
   },
 
@@ -43,67 +83,60 @@ export const projects: Project[] = [
     description:
       'Event-driven microservices order processing system implementing Saga orchestration, transactional outbox, retries, and DLQ for fault-tolerant workflows.',
     image: '/project/demo.png',
-    link: 'YOUR_LIVE_LINK',
+    link: 'https://github.com/sultanxdev/Eventify',
     technologies: [
-      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
       { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
-      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
-      { name: 'Docker', icon: <Docker key="docker" /> },
+
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
       { name: 'Express', icon: <ExpressJs key="express" /> },
+      { name: 'Kafka', icon: <Kafka key="kafka" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
+      { name: 'Prisma', icon: <Prisma key="prisma" /> },
+
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'Vercel', icon: <Vercel key="vercel" /> },
+      { name: 'AWS', icon: <AWS key="aws" /> },
+
     ],
-    github: 'YOUR_GITHUB_LINK',
-    live: 'YOUR_LIVE_LINK',
+    github: 'https://github.com/sultanxdev/Eventify',
+    live: 'https://github.com/sultanxdev/Eventify',
     details: true,
     projectDetailsPageSlug: '/projects/eventify',
     isWorking: false,
   },
 
-  // 🥉 3. Zendev — ambitious AI tooling
+  // 🥇 1. Zyven — distributed systems backbone
   {
-    title: 'Zendev',
+    title: 'Zyvan',
     description:
-      'AI-powered platform that converts natural language prompts into deployable full-stack applications with live preview and GitHub integration.',
+      'Production-grade webhook delivery infrastructure built on durable acknowledgment principles with idempotent ingestion, exponential retries, DLQ handling, and SSRF-safe outbound proxy architecture.',
     image: '/project/demo.png',
-    link: 'YOUR_LIVE_LINK',
+    link: 'https://www.zyvan.in',
     technologies: [
-      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
-      { name: 'React', icon: <ReactIcon key="react" /> },
-      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
-      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
       { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
-      { name: 'Docker', icon: <Docker key="docker" /> },
-    ],
-    github: 'YOUR_GITHUB_LINK',
-    live: 'YOUR_LIVE_LINK',
-    details: true,
-    projectDetailsPageSlug: '/projects/zendev',
-    isWorking: true,
-  },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'Express', icon: <ExpressJs key="express" /> },
+    
+      { name: 'BullMQ', icon: <BullMQ key="bullmq" /> },
+      { name: 'Redis', icon: <Redis key="redis" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
+      { name: 'Prisma', icon: <Prisma key="prisma" /> },
 
-  // 4️⃣ Parsona — SaaS product signal
-  {
-    title: 'Parsona',
-    description:
-      'AI-powered personal branding SaaS that generates persona-aligned social posts, schedules content, and tracks engagement analytics.',
-    image: '/project/demo.png',
-    //video: 'https://ik.imagekit.io/hokb3mrdr/notesbuddy.mp4?tr=orig',
-    link: 'YOUR_LIVE_LINK',
-    technologies: [
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'AWS', icon: <AWS key="aws" /> },
       { name: 'Next.js', icon: <NextJs key="nextjs" /> },
       { name: 'React', icon: <ReactIcon key="react" /> },
-      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
-      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
-      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
       { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
       { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
     ],
-    github: 'YOUR_GITHUB_LINK',
-    live: 'YOUR_LIVE_LINK',
+    live: 'https://www.zyvan.in',
     details: true,
-    projectDetailsPageSlug: '/projects/parsona',
-    isWorking: true,
+    projectDetailsPageSlug: '/projects/zyvan',
+    isWorking: false,
   },
+
+
+ 
 
   /* 
 {
