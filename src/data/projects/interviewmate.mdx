@@ -1,26 +1,39 @@
+Below is your **clean, production-ready MDX version** of Zyvan.
+
+It is:
+
+* ✅ MDX-safe
+* ✅ no extra spacing
+* ✅ recruiter-scannable
+* ✅ diagrams included
+* ✅ ready for Next.js content layer
+
+Paste directly into your `.mdx` file.
+
 ---
-title: 'InterviewMate — Real-Time AI Interview Platform'
-description: 'WebSocket-based AI interview simulator supporting live speech input, adaptive questioning, and automated evaluation reports.'
-image: '/project/interviewmate.png'
+
+````mdx
+---
+title: 'Zyvan — Reliable Webhook Delivery Infrastructure'
+description: 'Fault-tolerant webhook delivery platform with durable acknowledgment, idempotent ingestion, exponential retries, and SSRF-safe outbound proxy.'
+image: '/project/zyven.png'
 technologies:
   [
     'Next.js',
     'React',
     'Node.js',
     'Express',
-    'Socket.IO',
-    'MongoDB',
+    'BullMQ',
     'Redis',
-    'JWT',
-    'Deepgram',
-    'Google Gemini',
-    'ElevenLabs',
-    'Razorpay',
+    'PostgreSQL',
+    'TypeScript',
+    'Docker',
+    'AWS',
     'Tailwind CSS',
-    'Docker'
+    'Shadcn UI'
   ]
 github: 'YOUR_GITHUB_LINK'
-live: 'YOUR_LIVE_LINK'
+live: 'https://www.zyvan.in'
 timeline: '3–4 months'
 role: 'Full Stack Developer'
 team: 'Solo'
@@ -29,224 +42,194 @@ featured: true
 isPublished: true
 ---
 
-# InterviewMate — Real-Time AI Interview Platform
-
 ## Overview
 
-InterviewMate is a real-time AI interview simulation platform designed to replicate human-like technical and behavioral interviews using live speech input and adaptive questioning.
+Zyvan is a production-oriented webhook delivery system designed to guarantee reliable event delivery to third-party endpoints.
 
-Unlike traditional turn-based mock interview tools, the system processes streaming audio, performs partial transcription, and dynamically decides whether to interrupt, probe deeper, or proceed — creating a more realistic interview experience.
+Unlike naive webhook implementations that rely on best-effort HTTP calls, Zyvan introduces **durable acknowledgment, queue-driven dispatching, idempotent ingestion, and failure-aware retry orchestration**.
 
-The project focuses heavily on **low-latency streaming, real-time decision making, and fault-tolerant session management**.
-
----
-
-## Problem Statement
-
-Most mock interview platforms suffer from major limitations:
-
-- strictly turn-based interactions  
-- no real-time speech handling  
-- generic follow-up questions  
-- lack of realistic interviewer behavior  
-- delayed or static feedback  
-
-As a result, candidates do not experience the pressure and flow of real interviews.
-
-InterviewMate was built to simulate **continuous, adaptive, voice-driven interviews** with near real-time responsiveness.
+**Primary focus:** reliability, failure isolation, and secure outbound delivery.
 
 ---
 
-## Architecture Overview
+## 🚨 Problem
+
+Typical webhook systems suffer from:
+
+- lost events during transient failures  
+- duplicate deliveries  
+- tight coupling between ingestion and delivery  
+- lack of retry visibility  
+- SSRF attack surface  
+- poor delivery observability  
+
+At scale, these issues become operationally expensive.
+
+---
+
+## 🏗️ Architecture Overview
 
 ### High-Level Flow
 
-1. User starts interview session  
-2. Audio streamed via WebSocket  
-3. Deepgram performs streaming STT  
-4. Partial transcripts sent to AI decision engine  
-5. Gemini determines next interviewer action  
-6. ElevenLabs generates voice response  
-7. Session state persisted and analytics recorded  
+```mermaid
+flowchart LR
+    A[Client Event] --> B[API Ingest]
+    B --> C[(PostgreSQL)]
+    C --> D[BullMQ Queue]
+    D --> E[Worker]
+    E --> F[Outgoing Proxy]
+    F --> G[Customer Endpoint]
+    G --> H{Response}
+    H -->|2xx| I[Delivered]
+    H -->|Fail| J[Retry Scheduled]
+````
 
 ### Core Components
 
-- **Next.js Frontend** — live interview UI and dashboards  
-- **Node.js + Express** — API and session management  
-- **Socket.IO** — bidirectional real-time streaming  
-- **MongoDB** — users, sessions, token ledger  
-- **Redis (optional/queue)** — transient state and buffering  
-- **Deepgram** — streaming speech-to-text  
-- **Google Gemini** — adaptive questioning logic  
-- **ElevenLabs** — real-time text-to-speech  
-- **Razorpay** — token purchases  
+* **API Layer (Node.js + Express)** — validation and ingestion
+* **PostgreSQL** — durable source of truth
+* **BullMQ + Redis** — retry orchestration
+* **Worker Service** — webhook dispatcher
+* **Outgoing Proxy** — SSRF protection
+* **Next.js Dashboard** — delivery visibility
+* **Docker + AWS** — deployment
 
-**Why WebSockets?**
-
-HTTP polling introduced unacceptable latency for live interviews.  
-Socket.IO enabled full-duplex streaming and sub-second interaction.
+**Design principle:** queue-first, failure-aware delivery.
 
 ---
 
-## Key Technical Decisions
+## ⚙️ Key Technical Decisions
 
-### Streaming-First Architecture
+### Durable Acknowledgment Boundary
 
-**Problem:** Batch processing creates unnatural interview gaps.
+**Decision:** Reliability boundary occurs at DB commit.
 
-**Decision:** Designed pipeline around continuous audio streaming and partial transcripts.
+**Impact:**
 
-**Result:**
-
-- more natural conversation flow  
-- faster AI reaction time  
-- improved realism  
+* clients stop retrying safely
+* Zyvan owns delivery lifecycle
+* eliminates ghost failures
 
 ---
 
-### AI Decision Engine on Partial Transcripts
+### Idempotent Ingestion
 
-**Problem:** Waiting for final transcript increases response delay.
+**Decision:** Enforced unique idempotency keys.
 
-**Decision:** Feed partial transcripts to Gemini for early intent detection.
+**Impact:**
 
-**Trade-off:**
-
-- faster reactions  
-- but requires handling transcript instability  
-
----
-
-### Session State Machine
-
-Implemented explicit interview states:
-
-- initialized  
-- active  
-- paused  
-- completed  
-- failed  
-
-**Why it matters:**
-
-Real-time systems frequently face reconnects and partial failures.  
-State machine simplified recovery and token safety.
+* duplicate-safe processing
+* predictable delivery semantics
+* safer client retries
 
 ---
 
-### Token-Based Monetization with Transactions
+### Queue-Driven Retries
 
-**Problem:** Risk of token loss during failures.
+**Decision:** BullMQ with exponential backoff.
 
-**Decision:** MongoDB transactions + token locking.
+**Impact:**
 
-**Result:**
-
-- safe deduction  
-- rollback on failure  
-- auditable usage trail  
+* non-blocking retries
+* failure isolation
+* controlled retry storms
 
 ---
 
-## Challenges Faced
+### SSRF-Safe Delivery
 
-### Maintaining Sub-Second Responsiveness
+**Decision:** All outbound calls routed through proxy.
 
-Multiple AI services in the loop increased latency risk.
+**Protections:**
 
-**Solution:**
+* IP filtering
+* DNS validation
+* private range blocking
 
-- parallelized STT and decision pipeline  
-- used streaming transcripts  
-- optimized prompt size  
-
----
-
-### Handling Dropped Connections
-
-Real-time interviews frequently broke during network instability.
-
-**Solution:**
-
-- implemented reconnect logic  
-- persisted session checkpoints  
-- added graceful session recovery  
+**Why it matters:** webhook systems are common SSRF vectors.
 
 ---
 
-### Partial Transcript Instability
+## 🔄 Delivery State Machine
 
-Streaming STT produces changing interim text.
+```mermaid
+stateDiagram-v2
+    [*] --> RECEIVED
+    RECEIVED --> DISPATCHING
+    DISPATCHING --> DELIVERED
+    DISPATCHING --> RETRY_SCHEDULED
+    RETRY_SCHEDULED --> DISPATCHING
+    RETRY_SCHEDULED --> DEAD_LETTERED
+```
 
-**Solution:**
+Tracked states:
 
-- introduced confidence thresholds  
-- delayed hard decisions until stable segments  
-- allowed AI to revise follow-ups  
-
----
-
-## Performance Targets
-
-Designed system with the following goals:
-
-- STT latency: < 2s  
-- AI decision: < 1s  
-- TTS generation: < 1s  
-- end-to-end response: near real-time  
-
-*(Load testing and production metrics planned post-launch.)*
+* RECEIVED
+* DISPATCHING
+* DELIVERED
+* RETRY_SCHEDULED
+* DEAD_LETTERED
 
 ---
 
-## What I Learned
+## 🚧 Challenges
 
-- designing real-time streaming systems  
-- managing WebSocket lifecycle reliably  
-- handling partial and unstable data streams  
-- building AI-in-the-loop decision pipelines  
-- implementing safe token-based monetization  
-- importance of failure-first thinking  
+**Retry storms**
+→ solved with exponential backoff + capped attempts
 
----
+**Duplicate submissions**
+→ solved with idempotency index
 
-## Future Improvements
-
-Planned enhancements:
-
-- add OpenTelemetry tracing across WebSocket flow  
-- introduce Redis buffering for burst smoothing  
-- implement adaptive latency budgeting  
-- add interviewer personality modes  
-- run k6 load testing for concurrent sessions  
-- explore WebRTC for lower audio latency  
+**Unsafe outbound calls**
+→ solved with hardened proxy
 
 ---
 
-## Impact (Current Status)
+## 🎯 Performance Targets
 
-- End-to-end real-time interview flow working  
-- Adaptive questioning pipeline implemented  
-- Token billing and payments functional  
-- Analytics dashboard available  
+* ingestion acknowledgment: < 100 ms
+* queue enqueue: < 50 ms
+* worker dispatch: < 500 ms
+* retry strategy: exponential backoff
 
-*(User-scale metrics will be added after public beta.)*
+*(Load testing in progress.)*
 
 ---
 
-## My Role
+## 📚 What I Learned
+
+* designing reliable delivery systems
+* queue-first architecture
+* idempotent API design
+* failure-aware retries
+* SSRF mitigation
+* durability boundaries
+
+---
+
+## 🚀 Roadmap
+
+* OpenTelemetry tracing
+* per-endpoint rate limiting
+* adaptive retry policies
+* multi-region queues
+* large-scale load testing
+
+---
+
+## 👨‍💻 My Role
 
 As the solo developer, I:
 
-- designed the real-time streaming architecture  
-- implemented WebSocket audio pipeline  
-- integrated Deepgram, Gemini, and ElevenLabs  
-- built the session state machine  
-- implemented token billing and Razorpay flow  
-- developed the full-stack dashboard experience  
+* designed the delivery architecture
+* implemented idempotent ingestion
+* built BullMQ retry pipeline
+* developed SSRF proxy strategy
+* modeled delivery state machine
+* built full-stack dashboard
 
 ---
 
-## Key Takeaway
+## 🧠 Key Takeaway
 
-InterviewMate gave me hands-on experience building a real-time, AI-driven system that combines streaming audio, adaptive decision making, and fault-tolerant session handling — highlighting the challenges of low-latency interactive platforms.
+Zyvan demonstrates how to build **fault-tolerant webhook infrastructure** using queue-driven processing, strong idempotency guarantees, and security-first outbound delivery.

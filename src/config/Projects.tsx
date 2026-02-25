@@ -47,7 +47,7 @@ export const projects: Project[] = [
     live: 'https://interviewmate.sultanx.dev',
     details: true,
     projectDetailsPageSlug: '/projects/interviewmate',
-    isWorking: true,
+    isWorking: false,
   },
    {
     title: 'Parsona',
@@ -74,7 +74,7 @@ export const projects: Project[] = [
     live: 'https://parsona.sultanx.dev',
     details: true,
     projectDetailsPageSlug: '/projects/parsona',
-    isWorking: true,
+    isWorking: false,
   },
 
   // 🥈 2. Eventify — backend credibility
