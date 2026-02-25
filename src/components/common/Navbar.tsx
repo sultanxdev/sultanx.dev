@@ -47,7 +47,7 @@ export default function Navbar() {
           {/* Right side: X DM button + Theme toggle */}
           <div className="flex items-center gap-4 pl-4 md:pl-6">
             <a
-              href="https://x.com/messages/compose?recipient_id=sultanxdev"
+              href="https://x.com/sultanxdev"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-1.5 size-10 rounded-md text-sm font-medium cursor-pointer transition-all duration-300 hover:bg-accent hover:text-accent-foreground active:scale-95"
