@@ -53,10 +53,10 @@ export default function Navbar() {
               className="inline-flex items-center justify-center gap-1.5 size-10 rounded-md text-sm font-medium cursor-pointer transition-all duration-300 hover:bg-accent hover:text-accent-foreground active:scale-95"
               aria-label="DM me on X"
             >
-              <span className="text-xs font-medium">DM</span>
+              <span className="text-xs font-bold">DM</span>
               <svg
                 viewBox="0 0 24 24"
-                className="h-5.5 w-5.5 fill-current"
+                className="h-3 w-3 fill-current"
                 aria-hidden="true"
               >
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />

@@ -13,15 +13,15 @@ export interface PageMeta {
 export const siteConfig = {
   name: heroConfig.name,
   title: 'Sleek Portfolio',
-  description: 'Sleek Portfolio Template by @Sultanxdev',
-  url: process.env.NEXT_PUBLIC_URL || 'https://www.sultanx.dev',
+  description: 'Sleek Portfolio Template by @Ramxcodes',
+  url: process.env.NEXT_PUBLIC_URL || 'http://localhost:3000',
   ogImage: '/meta/opengraph-image.png',
   author: {
     name: about.name,
-    twitter: '@sultanxdev',
-    github: 'Sultanxdev',
-    linkedin: 'Sultan alam',
-    email: 'sultanalamdev@gmail.com',
+    twitter: '@ramxcodes',
+    github: 'ramxcodes',
+    linkedin: 'ramxcodes',
+    email: 'ramxcodes@gmail.com',
   },
   keywords: [
     'portfolio',
@@ -57,7 +57,7 @@ export const pageMetadata: Record<string, PageMeta> = {
     description:
       "Get in touch with me for collaborations, projects, or opportunities. I'd love to hear from you!",
     keywords: ['contact', 'hire', 'collaboration', 'freelance', 'developer'],
-    ogImage: '/meta/contact.png',
+    ogImage: '/assets/logo.png',
     twitterCard: 'summary',
   },
 
@@ -158,22 +158,6 @@ export const pageMetadata: Record<string, PageMeta> = {
     ogImage: '/meta/setup.png',
     twitterCard: 'summary_large_image',
   },
-
-  // Journey page
-  '/journey': {
-    title: 'Journey - My Path in Tech',
-    description:
-      'A timeline of my professional journey, achievements, and technical growth over the years.',
-    keywords: [
-      'career journey',
-      'tech path',
-      'milestones',
-      'achievements',
-      'growth',
-    ],
-    ogImage: '/meta/work.png',
-    twitterCard: 'summary_large_image',
-  },
 };
 
 // Helper function to get metadata for a specific page
@@ -211,7 +195,6 @@ export function generateMetadata(pathname: string) {
       card: pageMeta.twitterCard || 'summary_large_image',
       title: pageMeta.title,
       description: pageMeta.description,
-      site: siteConfig.author.twitter,
       creator: siteConfig.author.twitter,
       images: [pageMeta.ogImage || siteConfig.ogImage],
     },

@@ -60,6 +60,8 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title,
       description,
+      site: siteConfig.author.twitter,
+      creator: siteConfig.author.twitter,
       images: [image],
     },
   };
