@@ -27,7 +27,7 @@ export const projects: Project[] = [
     description:
       'Real-time AI interview simulation platform using WebSockets, streaming speech-to-text, and adaptive questioning for human-like interview practice.',
     image: '/project/demo.png',
-    link: 'YOUR_LIVE_LINK',
+    link: 'https://github.com/sultanxdev/interviewmate',
     technologies: [
       { name: 'React', icon: <ReactIcon key="react" /> },
       { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
