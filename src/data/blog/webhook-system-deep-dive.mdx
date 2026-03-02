@@ -1,0 +1,268 @@
+---
+title: "How I Built a Fault-Tolerant Webhook Delivery System from Scratch"
+description: 'A deep dive into building Zyvan — a production-grade webhook infrastructure with durable acknowledgment, retry orchestration, and SSRF protection'
+image: '/blog/webhook-system-deep-dive.png'
+tags: ['backend', 'system-design', 'nodejs', 'redis']
+date: '2026-02-15'
+isPublished: true
+---
+
+# How I Built a Fault-Tolerant Webhook Delivery System from Scratch
+
+Webhooks seem simple: receive an event, make an HTTP call. Done, right? That's what I thought too — until I actually tried to build one that doesn't lose events, doesn't DDOS your customers, and doesn't become an SSRF vector. Here's how I built **Zyvan**, a webhook delivery platform that takes reliability seriously.
+
+## Table of Contents
+
+- [The Naive Approach (And Why It Fails)](#the-naive-approach-and-why-it-fails)
+- [Drawing the Durability Boundary](#drawing-the-durability-boundary)
+- [Queue-First Architecture](#queue-first-architecture)
+- [Solving the Duplicate Problem](#solving-the-duplicate-problem)
+- [The Retry Strategy That Doesn't Kill Endpoints](#the-retry-strategy-that-doesnt-kill-endpoints)
+- [SSRF: The Security Hole Nobody Talks About](#ssrf-the-security-hole-nobody-talks-about)
+- [The Delivery State Machine](#the-delivery-state-machine)
+
+## The Naive Approach (And Why It Fails)
+
+Most tutorials show webhook delivery like this:
+
+```javascript
+// ❌ The naive approach
+app.post('/webhook', async (req, res) => {
+  const event = req.body;
+
+  // Save to DB
+  await db.events.create(event);
+
+  // Immediately try to deliver
+  await fetch(event.targetUrl, {
+    method: 'POST',
+    body: JSON.stringify(event.payload),
+  });
+
+  res.json({ status: 'delivered' });
+});
+```
+
+This looks clean, but it has **five critical failure modes**:
+
+1. **Lost events** — if the HTTP call fails, the event is gone forever
+2. **Slow responses** — the client waits while you make an external HTTP call
+3. **No retries** — transient failures become permanent failures
+4. **Duplicate deliveries** — if the client retries, you deliver twice
+5. **SSRF attacks** — anyone can point your server at internal IPs
+
+In production, each of these compounds into a trust-destroying experience. Let me show you how I solved each one.
+
+## Drawing the Durability Boundary
+
+The most important architectural decision in Zyvan was defining **where the reliability boundary lives**.
+
+```javascript
+// ✅ Zyvan's approach: acknowledge at DB commit
+app.post('/ingest', async (req, res) => {
+  const { idempotencyKey, payload, targetUrl } = req.body;
+
+  // 1. Persist the event (this IS the durability guarantee)
+  const event = await db.events.create({
+    idempotencyKey,
+    payload,
+    targetUrl,
+    status: 'RECEIVED',
+  });
+
+  // 2. Enqueue for async delivery
+  await queue.add('deliver', { eventId: event.id });
+
+  // 3. Respond immediately — client can stop retrying
+  res.status(202).json({
+    id: event.id,
+    status: 'accepted',
+  });
+});
+```
+
+The key insight: **the client gets a `202 Accepted` the moment the event is persisted to PostgreSQL**. Not after delivery. Not after the webhook fires. At the DB commit.
+
+This means:
+- The client knows their event is safe and can stop retrying
+- Zyvan now owns the entire delivery lifecycle
+- External endpoint failures don't affect ingestion
+
+## Queue-First Architecture
+
+Once events are persisted, a BullMQ worker picks them up for delivery:
+
+```javascript
+import { Worker } from 'bullmq';
+
+const worker = new Worker('deliver', async (job) => {
+  const { eventId } = job.data;
+  const event = await db.events.findById(eventId);
+
+  // Update status to DISPATCHING
+  await db.events.update(eventId, { status: 'DISPATCHING' });
+
+  try {
+    const response = await deliveryProxy.send(event.targetUrl, event.payload);
+
+    if (response.ok) {
+      await db.events.update(eventId, {
+        status: 'DELIVERED',
+        deliveredAt: new Date(),
+      });
+    } else {
+      throw new Error(`HTTP ${response.status}`);
+    }
+  } catch (error) {
+    await db.events.update(eventId, {
+      status: 'RETRY_SCHEDULED',
+      lastError: error.message,
+    });
+    throw error; // BullMQ will handle the retry
+  }
+});
+```
+
+**Why BullMQ over a simple `setTimeout`?**
+- Survives server restarts (Redis-backed persistence)
+- Built-in exponential backoff
+- Configurable max attempts
+- Dead letter queue for permanently failed events
+- Concurrency control
+
+## Solving the Duplicate Problem
+
+Clients will retry. Networks will hiccup. The same event will arrive twice. Zyvan handles this with **idempotent ingestion**:
+
+```javascript
+// Database schema enforces uniqueness
+CREATE TABLE events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  idempotency_key VARCHAR(255) UNIQUE NOT NULL,
+  payload JSONB NOT NULL,
+  target_url TEXT NOT NULL,
+  status VARCHAR(50) DEFAULT 'RECEIVED',
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+// In the ingestion handler
+const existing = await db.events.findByIdempotencyKey(key);
+if (existing) {
+  // Return the same response — safe, no side effects
+  return res.status(200).json({
+    id: existing.id,
+    status: existing.status,
+    message: 'Event already accepted',
+  });
+}
+```
+
+The `UNIQUE` constraint on `idempotency_key` means even if two identical requests arrive simultaneously, the database will reject the duplicate. The client always gets a clean response.
+
+## The Retry Strategy That Doesn't Kill Endpoints
+
+Here's a common mistake: retrying failed webhooks every 5 seconds. If an endpoint is down for maintenance, you're essentially DDOSing it the moment it comes back up.
+
+Zyvan uses **exponential backoff with jitter**:
+
+```javascript
+const workerOptions = {
+  connection: redisConnection,
+  defaultJobOptions: {
+    attempts: 8,
+    backoff: {
+      type: 'exponential',
+      delay: 10000, // Start at 10 seconds
+    },
+    removeOnComplete: true,
+    removeOnFail: false, // Keep failed jobs for inspection
+  },
+};
+```
+
+This creates a retry schedule like:
+
+| Attempt | Delay |
+|---------|-------|
+| 1 | 10 seconds |
+| 2 | 20 seconds |
+| 3 | 40 seconds |
+| 4 | ~1.3 minutes |
+| 5 | ~2.7 minutes |
+| 6 | ~5.3 minutes |
+| 7 | ~10.7 minutes |
+| 8 | ~21.3 minutes |
+
+After 8 attempts, the event moves to `DEAD_LETTERED` status. It's preserved in the database, visible in the dashboard, and can be manually retried by the user.
+
+## SSRF: The Security Hole Nobody Talks About
+
+Here's the scariest part of webhooks: **your server makes HTTP requests to URLs provided by users**. Without protection, an attacker can point your webhook at:
+
+- `http://169.254.169.254/latest/meta-data/` (AWS metadata)
+- `http://localhost:6379/` (your Redis instance)
+- Internal service endpoints
+
+Zyvan routes all outbound calls through a **hardened proxy**:
+
+```javascript
+const deliveryProxy = {
+  async send(targetUrl, payload) {
+    const parsed = new URL(targetUrl);
+
+    // 1. Resolve DNS first
+    const addresses = await dns.resolve(parsed.hostname);
+
+    // 2. Block private/internal IPs
+    for (const addr of addresses) {
+      if (isPrivateIP(addr)) {
+        throw new Error(`SSRF blocked: ${addr} is a private IP`);
+      }
+    }
+
+    // 3. Block known cloud metadata endpoints
+    if (isCloudMetadataIP(addresses)) {
+      throw new Error('SSRF blocked: cloud metadata endpoint');
+    }
+
+    // 4. Only then make the request
+    return fetch(targetUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(30000), // 30s timeout
+    });
+  },
+};
+```
+
+## The Delivery State Machine
+
+Every event in Zyvan follows a clear state machine:
+
+```
+RECEIVED → DISPATCHING → DELIVERED
+                ↓
+         RETRY_SCHEDULED → DISPATCHING (loop)
+                ↓
+          DEAD_LETTERED
+```
+
+This gives full visibility into where every event is in its lifecycle. The Next.js dashboard queries these states to show real-time delivery metrics — success rates, retry counts, failure reasons.
+
+---
+
+## Key Takeaways
+
+If you're building a webhook delivery system, keep these principles in mind:
+
+1. **Define your durability boundary early** — acknowledge at DB commit, not at delivery
+2. **Decouple ingestion from delivery** — a failing endpoint should never block event acceptance
+3. **Make ingestion idempotent** — clients will retry, and that's okay
+4. **Use exponential backoff** — respect your customer's endpoints
+5. **Block SSRF by default** — validate every outbound URL before making the request
+6. **Model explicit delivery states** — know exactly where every event is at all times
+
+Webhook delivery is one of those problems that seems trivially simple until it isn't. Building Zyvan taught me that **the difference between a toy webhook and a production webhook is entirely about failure handling**.
+
+Thanks for reading! Find me on X — [@sultanxdev](https://x.com/sultanxdev)
