@@ -12,8 +12,7 @@ export default function Navbar() {
 
   return (
     <>
-      <Container className="sticky top-4 z-50 rounded-full border border-white/10 bg-background/40 py-2 shadow-lg backdrop-blur-md !max-w-[702px]">
-        <div className="flex items-center justify-between px-4">
+<Container className="sticky top-4 z-50 rounded-md border border-white/10 bg-background/40 py-2 shadow-lg backdrop-blur-md !max-w-[703px]">        <div className="flex items-center justify-between px-4">
           {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-6">
             {navbarConfig.navItems.map((item) => (

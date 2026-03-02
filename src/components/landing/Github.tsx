@@ -4,7 +4,7 @@ import { githubConfig } from '@/config/Github';
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Container from '../common/Container';
 import GithubIcon from '../svgs/Github';
@@ -25,14 +25,33 @@ type GitHubContributionResponse = {
   date: string;
   contributionCount: number;
   contributionLevel:
-    | 'NONE'
-    | 'FIRST_QUARTILE'
-    | 'SECOND_QUARTILE'
-    | 'THIRD_QUARTILE'
-    | 'FOURTH_QUARTILE';
+  | 'NONE'
+  | 'FIRST_QUARTILE'
+  | 'SECOND_QUARTILE'
+  | 'THIRD_QUARTILE'
+  | 'FOURTH_QUARTILE';
 };
 
-// Helper function to filter contributions to past year
+const contributionLevelMap = {
+  NONE: 0,
+  FIRST_QUARTILE: 1,
+  SECOND_QUARTILE: 2,
+  THIRD_QUARTILE: 3,
+  FOURTH_QUARTILE: 4,
+} as const;
+
+// Filter contributions to a specific year
+function filterByYear(
+  contributions: ContributionItem[],
+  year: number,
+): ContributionItem[] {
+  return contributions.filter((item) => {
+    const itemYear = new Date(item.date).getFullYear();
+    return itemYear === year;
+  });
+}
+
+// Filter contributions to the last 365 days
 function filterLastYear(contributions: ContributionItem[]): ContributionItem[] {
   const oneYearAgo = new Date();
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
@@ -43,12 +62,105 @@ function filterLastYear(contributions: ContributionItem[]): ContributionItem[] {
   });
 }
 
+// Year dropdown component
+function YearSelector({
+  selectedYear,
+  onYearChange,
+  years,
+}: {
+  selectedYear: string;
+  onYearChange: (year: string) => void;
+  years: string[];
+}) {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setOpen(!open)}
+        className="border-border bg-background hover:bg-accent text-foreground inline-flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors"
+      >
+        {selectedYear === 'current' ? 'Current' : selectedYear}
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="border-border bg-background absolute right-0 z-50 mt-1 min-w-[120px] overflow-hidden rounded-lg border shadow-lg">
+          {years.map((year) => (
+            <button
+              key={year}
+              onClick={() => {
+                onYearChange(year);
+                setOpen(false);
+              }}
+              className={`hover:bg-accent flex w-full cursor-pointer items-center justify-between px-3 py-2 text-left text-sm transition-colors ${selectedYear === year
+                  ? 'text-primary font-medium'
+                  : 'text-foreground'
+                }`}
+            >
+              {year === 'current' ? 'Current' : year}
+              {selectedYear === year && (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  className="text-primary"
+                >
+                  <path d="M5 12l5 5L20 7" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Github() {
+  const [allContributions, setAllContributions] = useState<ContributionItem[]>(
+    [],
+  );
   const [contributions, setContributions] = useState<ContributionItem[]>([]);
   const [totalContributions, setTotalContributions] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<string>('current');
   const { theme } = useTheme();
+
+  const currentYear = new Date().getFullYear();
+  // Generate years from currentYear down to the year the account started (2025)
+  const availableYears = ['current'];
+  for (let y = currentYear; y >= 2025; y--) {
+    availableYears.push(String(y));
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -57,22 +169,14 @@ export default function Github() {
         const response = await fetch(
           `${githubConfig.apiUrl}/${githubConfig.username}.json`,
         );
-        const data: { contributions?: unknown[] } = await response.json();
+        const data: {
+          contributions?: unknown[];
+          totalContributions?: number;
+        } = await response.json();
 
         if (data?.contributions && Array.isArray(data.contributions)) {
-          // Flatten the nested array structure
           const flattenedContributions = data.contributions.flat();
 
-          // Convert contribution levels to numbers
-          const contributionLevelMap = {
-            NONE: 0,
-            FIRST_QUARTILE: 1,
-            SECOND_QUARTILE: 2,
-            THIRD_QUARTILE: 3,
-            FOURTH_QUARTILE: 4,
-          };
-
-          // Transform to the expected format
           const validContributions = flattenedContributions
             .filter(
               (item: unknown): item is GitHubContributionResponse =>
@@ -91,16 +195,14 @@ export default function Github() {
             }));
 
           if (validContributions.length > 0) {
-            // Calculate total contributions
-            const total = validContributions.reduce(
-              (sum, item) => sum + item.count,
-              0,
-            );
-            setTotalContributions(total);
+            setAllContributions(validContributions);
 
-            // Filter to show only the past year
-            const filteredContributions = filterLastYear(validContributions);
-            setContributions(filteredContributions);
+            // Default to "current" — last 365 days
+            const filtered = filterLastYear(validContributions);
+            setContributions(filtered);
+
+            const total = filtered.reduce((sum, item) => sum + item.count, 0);
+            setTotalContributions(total);
           } else {
             setHasError(true);
           }
@@ -117,6 +219,22 @@ export default function Github() {
 
     fetchData();
   }, []);
+
+  // When year changes, re-filter contributions
+  useEffect(() => {
+    if (allContributions.length === 0) return;
+
+    let filtered: ContributionItem[];
+    if (selectedYear === 'current') {
+      filtered = filterLastYear(allContributions);
+    } else {
+      filtered = filterByYear(allContributions, Number(selectedYear));
+    }
+
+    setContributions(filtered);
+    const total = filtered.reduce((sum, item) => sum + item.count, 0);
+    setTotalContributions(total);
+  }, [selectedYear, allContributions]);
 
   return (
     <Container className="mt-20">
@@ -137,9 +255,19 @@ export default function Github() {
                   {totalContributions.toLocaleString()}
                 </span>{' '}
                 contributions
+                {selectedYear !== 'current' && ` in ${selectedYear}`}
               </p>
             )}
           </div>
+
+          {/* Year Selector */}
+          {!isLoading && !hasError && (
+            <YearSelector
+              selectedYear={selectedYear}
+              onYearChange={setSelectedYear}
+              years={availableYears}
+            />
+          )}
         </div>
 
         {/* Content */}

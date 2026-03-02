@@ -266,3 +266,17 @@
 .prose h4 {
   font-size: calc(var(--blog-font-size) * 1.25);
 }
+
+/* Marquee animation for Skills section */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
