@@ -14,11 +14,11 @@ export default function page() {
     <Container className="min-h-screen py-16">
       <Hero />
       <Experience />
-      <Skills />
       <Work />
-      <About />
+      <Skills />
       <Github />
       <Blog />
+      <About />
       <CTA />
     </Container>
   );
