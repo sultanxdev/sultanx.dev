@@ -12,8 +12,8 @@ export interface PageMeta {
 // Base site configuration
 export const siteConfig = {
   name: heroConfig.name,
-  title: 'Sleek Portfolio',
-  description: 'Sleek Portfolio Template by @Sultanxdev',
+  title: 'Sultan Portfolio',
+  description: 'Sultan Portfolio Template by @Sultanxdev',
   url:'https://www.sultanx.dev',
   ogImage: '/meta/opengraph-image.png',
   author: {
