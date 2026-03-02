@@ -52,7 +52,7 @@ export default function Footer() {
       <Container className="pb-8">
         <div className="relative h-[10rem] sm:h-[12rem] md:h-[16rem]">
           <div className="absolute inset-0 flex items-center justify-center">
-            <TextHoverEffect text="SULTAN" duration={0.3} />
+            <TextHoverEffect text="SULTAN" duration={0.5} />
           </div>
         </div>
       </Container>

@@ -47,7 +47,7 @@ export const pageMetadata: Record<string, PageMeta> = {
       'web development',
       'projects',
     ],
-    ogImage: '/meta/hero.png',
+    ogImage: '/meta/opengraph-image.png',
     twitterCard: 'summary_large_image',
   },
 
@@ -57,7 +57,7 @@ export const pageMetadata: Record<string, PageMeta> = {
     description:
       "Get in touch with me for collaborations, projects, or opportunities. I'd love to hear from you!",
     keywords: ['contact', 'hire', 'collaboration', 'freelance', 'developer'],
-    ogImage: '/meta/contact.png',
+    ogImage: '/meta/opengraph-image.png',
     twitterCard: 'summary',
   },
 
@@ -73,7 +73,7 @@ export const pageMetadata: Record<string, PageMeta> = {
       'software developer',
       'employment history',
     ],
-    ogImage: '/meta/work.png',
+    ogImage: '/meta/opengraph-image.png',
     twitterCard: 'summary_large_image',
   },
 
@@ -89,7 +89,7 @@ export const pageMetadata: Record<string, PageMeta> = {
       'applications',
       'software',
     ],
-    ogImage: '/meta/projects.png',
+    ogImage: '/meta/opengraph-image.png',
     twitterCard: 'summary_large_image',
   },
 
@@ -105,7 +105,7 @@ export const pageMetadata: Record<string, PageMeta> = {
       'web development',
       'technical writing',
     ],
-    ogImage: '/meta/blogs.png',
+    ogImage: '/meta/opengraph-image.png',
     twitterCard: 'summary_large_image',
   },
 
@@ -121,7 +121,7 @@ export const pageMetadata: Record<string, PageMeta> = {
       'qualifications',
       'download',
     ],
-    ogImage: '/meta/resume.png',
+    ogImage: '/meta/opengraph-image.png',
     twitterCard: 'summary',
   },
 
@@ -138,7 +138,7 @@ export const pageMetadata: Record<string, PageMeta> = {
       'productivity',
       'development environment',
     ],
-    ogImage: '/meta/gears.png',
+    ogImage: '/meta/opengraph-image.png',
     twitterCard: 'summary_large_image',
   },
 
@@ -171,7 +171,7 @@ export const pageMetadata: Record<string, PageMeta> = {
       'achievements',
       'growth',
     ],
-    ogImage: '/meta/work.png',
+    ogImage: '/meta/opengraph-image.png',
     twitterCard: 'summary_large_image',
   },
 };
@@ -184,6 +184,11 @@ export function getPageMetadata(pathname: string): PageMeta {
 // Helper function to generate complete metadata object for Next.js
 export function generateMetadata(pathname: string) {
   const pageMeta = getPageMetadata(pathname);
+  const ogImageUrl = new URL(
+    pageMeta.ogImage || siteConfig.ogImage,
+    siteConfig.url
+  ).toString();
+  const pageUrl = new URL(pathname, siteConfig.url).toString();
 
   return {
     metadataBase: new URL(siteConfig.url),
@@ -194,13 +199,13 @@ export function generateMetadata(pathname: string) {
     creator: siteConfig.author.name,
     openGraph: {
       type: 'website',
-      url: `${siteConfig.url}${pathname}`,
+      url: pageUrl,
       title: pageMeta.title,
       description: pageMeta.description,
       siteName: siteConfig.title,
       images: [
         {
-          url: pageMeta.ogImage || siteConfig.ogImage,
+          url: ogImageUrl,
           width: 1200,
           height: 630,
           alt: pageMeta.title,
@@ -213,7 +218,7 @@ export function generateMetadata(pathname: string) {
       description: pageMeta.description,
       site: siteConfig.author.twitter,
       creator: siteConfig.author.twitter,
-      images: [pageMeta.ogImage || siteConfig.ogImage],
+      images: [ogImageUrl],
     },
     robots: {
       index: true,
@@ -227,7 +232,7 @@ export function generateMetadata(pathname: string) {
       },
     },
     alternates: {
-      canonical: `${siteConfig.url}${pathname}`,
+      canonical: pageUrl,
     },
   };
 }
