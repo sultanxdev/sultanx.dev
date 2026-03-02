@@ -4,11 +4,32 @@ import { githubConfig } from '@/config/Github';
 import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Container from '../common/Container';
 import GithubIcon from '../svgs/Github';
 import { Button } from '../ui/button';
+
+// Hook to measure container width for responsive graph sizing
+function useContainerWidth() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+
+  const measure = useCallback(() => {
+    if (ref.current) {
+      setWidth(ref.current.getBoundingClientRect().width);
+    }
+  }, []);
+
+  useEffect(() => {
+    measure();
+    const observer = new ResizeObserver(() => measure());
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [measure]);
+
+  return { ref, width };
+}
 
 const ActivityCalendar = dynamic(
   () => import('react-activity-calendar').then((mod) => mod.default),
@@ -118,8 +139,8 @@ function YearSelector({
                 setOpen(false);
               }}
               className={`hover:bg-accent flex w-full cursor-pointer items-center justify-between px-3 py-2 text-left text-sm transition-colors ${selectedYear === year
-                  ? 'text-primary font-medium'
-                  : 'text-foreground'
+                ? 'text-primary font-medium'
+                : 'text-foreground'
                 }`}
             >
               {year === 'current' ? 'Current' : year}
@@ -140,6 +161,86 @@ function YearSelector({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+// Number of weeks in a full year of contributions
+const WEEKS_IN_YEAR = 53;
+// Rows = 7 days
+const DAYS_IN_WEEK = 7;
+
+function ResponsiveGraph({
+  contributions,
+  theme,
+}: {
+  contributions: ContributionItem[];
+  theme: string | undefined;
+}) {
+  const { ref, width } = useContainerWidth();
+
+  // Calculate responsive block size based on available width
+  // We subtract padding (p-4 on mobile = 32px, p-6 on desktop = 48px) and some margin for labels
+  const padding = width < 500 ? 32 : 48;
+  const labelSpace = width < 400 ? 0 : 28; // space for weekday labels on the left
+  const availableWidth = Math.max(width - padding - labelSpace, 100);
+
+  // Calculate block size and margin that fits all 53 weeks
+  // totalWidth = WEEKS * (blockSize + blockMargin) - blockMargin
+  // So: blockSize + blockMargin = availableWidth / WEEKS (approximately)
+  const cellTotal = availableWidth / WEEKS_IN_YEAR;
+
+  // Keep a ratio of ~3:1 for block:margin
+  let blockMargin = Math.max(Math.floor(cellTotal / 4), 1);
+  let blockSize = Math.max(Math.floor(cellTotal - blockMargin), 2);
+
+  // Cap at reasonable max sizes
+  blockSize = Math.min(blockSize, 11);
+  blockMargin = Math.min(blockMargin, 4);
+
+  // Font size scales with block size
+  const fontSize = blockSize <= 4 ? 7 : blockSize <= 6 ? 8 : 10;
+  const isMobile = width > 0 && width < 500;
+
+  // Don't render until we have a width measurement
+  if (width === 0) {
+    return (
+      <div ref={ref} className="relative w-full">
+        <div className="bg-background/50 relative rounded-lg border border-dashed border-black/20 p-4 backdrop-blur-sm sm:p-6 dark:border-white/10">
+          <div className="flex items-center justify-center py-8">
+            <div className="border-primary mx-auto h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={ref} className="relative w-full overflow-hidden">
+      <div className="bg-background/50 relative flex w-full justify-center rounded-lg border border-dashed border-black/20 p-3 backdrop-blur-sm sm:p-6 dark:border-white/10">
+        <div className="flex w-full items-center justify-center overflow-x-auto">
+          <ActivityCalendar
+            data={contributions}
+            blockSize={blockSize}
+            blockMargin={blockMargin}
+            fontSize={fontSize}
+            colorScheme={theme === 'dark' ? 'dark' : 'light'}
+            maxLevel={githubConfig.maxLevel}
+            hideTotalCount={true}
+            hideColorLegend={isMobile}
+            hideMonthLabels={false}
+            theme={githubConfig.theme}
+            labels={{
+              months: githubConfig.months,
+              weekdays: isMobile ? ['', '', '', '', '', '', ''] : githubConfig.weekdays,
+              totalCount: githubConfig.totalCountLabel,
+            }}
+            style={{
+              color: 'rgb(139, 148, 158)',
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
@@ -240,7 +341,7 @@ export default function Github() {
     <Container className="mt-20">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-foreground text-2xl font-bold">
               {githubConfig.title}
@@ -300,32 +401,10 @@ export default function Github() {
             </Button>
           </div>
         ) : (
-          <div className="relative overflow-hidden">
-            <div className="bg-background/50 relative rounded-lg border border-dashed border-black/20 p-6 backdrop-blur-sm dark:border-white/10">
-              <div className="w-full overflow-x-auto">
-                <ActivityCalendar
-                  data={contributions}
-                  blockSize={9}
-                  blockMargin={3}
-                  fontSize={githubConfig.fontSize}
-                  colorScheme={theme === 'dark' ? 'dark' : 'light'}
-                  maxLevel={githubConfig.maxLevel}
-                  hideTotalCount={true}
-                  hideColorLegend={false}
-                  hideMonthLabels={false}
-                  theme={githubConfig.theme}
-                  labels={{
-                    months: githubConfig.months,
-                    weekdays: githubConfig.weekdays,
-                    totalCount: githubConfig.totalCountLabel,
-                  }}
-                  style={{
-                    color: 'rgb(139, 148, 158)',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+          <ResponsiveGraph
+            contributions={contributions}
+            theme={theme}
+          />
         )}
       </div>
     </Container>
