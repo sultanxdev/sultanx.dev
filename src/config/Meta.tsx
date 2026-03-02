@@ -14,7 +14,7 @@ export const siteConfig = {
   name: heroConfig.name,
   title: 'Sleek Portfolio',
   description: 'Sleek Portfolio Template by @Sultanxdev',
-  url: process.env.NEXT_PUBLIC_URL || 'https://www.sultanx.dev',
+  url:'https://www.sultanx.dev',
   ogImage: '/meta/opengraph-image.png',
   author: {
     name: about.name,
