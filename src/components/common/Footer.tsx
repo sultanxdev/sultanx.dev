@@ -5,11 +5,17 @@ import React from 'react';
 
 import { TextHoverEffect } from '../ui/text-hover-effect';
 import Container from './Container';
+import { VisitorCounter } from './VisitorCounter';
 
 export default function Footer() {
   return (
     <footer>
       <Container className="py-16">
+        {/* Visitor counter */}
+        <div className="mb-8">
+          <VisitorCounter />
+        </div>
+
         <div className="border-border border-t pt-10">
           <div className="flex flex-col items-center justify-between gap-4 text-sm sm:flex-row">
             <p className="text-muted-foreground text-xs">

@@ -32,9 +32,9 @@ export default function RootLayout({
               <Navbar />
               {children}
               <OnekoCat />
-              <Quote />
+              
               <Footer />
-              <ChatBubble />
+              
               <UmamiAnalytics />
             </ReactLenis>
           </ThemeProvider>
