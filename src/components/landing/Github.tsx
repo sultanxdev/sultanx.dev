@@ -168,7 +168,7 @@ function YearSelector({
 // Number of weeks in a full year of contributions
 const WEEKS_IN_YEAR = 53;
 // Rows = 7 days
-const DAYS_IN_WEEK = 7;
+//const DAYS_IN_WEEK = 7;
 
 function ResponsiveGraph({
   contributions,
