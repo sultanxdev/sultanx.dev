@@ -33,7 +33,7 @@ const LightPillar = (props: LightPillarProps) => {
     pillarHeight = 0.4,
     noiseIntensity = 0.5,
     mixBlendMode = 'screen',
-    pillarRotation = 0,
+    pillarRotation = 25,
     quality = 'high'
   } = props;
   const containerRef = useRef<HTMLDivElement>(null);
