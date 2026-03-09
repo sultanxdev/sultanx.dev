@@ -13,6 +13,7 @@ import CV from '../svgs/CV';
 import Chat from '../svgs/Chat';
 import { Button } from '../ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import LightPillar from './LightPillar';
 
 const CHARS =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -121,8 +122,25 @@ export default function Hero() {
   };
 
   return (
-    <Container className="mx-auto max-w-5xl">
-      {/* Availability badge */}
+    <div className="relative w-full">
+      <div className="absolute top-[-150px] left-1/2 -translate-x-1/2 w-screen max-w-[100vw] h-[600px] overflow-hidden -z-10 pointer-events-none [mask-image:linear-gradient(to_bottom,white_40%,transparent_100%)]">
+        <LightPillar
+          topColor="#37fb72"
+          bottomColor="#e4ece4"
+          intensity={1}
+          rotationSpeed={0.3}
+          glowAmount={0.002}
+          pillarWidth={1.9}
+          pillarHeight={0.4}
+          noiseIntensity={0.4}
+          pillarRotation={27}
+          interactive={false}
+          mixBlendMode="screen"
+          quality="high"
+        />
+      </div>
+      <Container className="mx-auto max-w-5xl relative z-10">
+        {/* Availability badge */}
       <div className="mb-8">
         <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
           <span className="relative flex h-2 w-2">
@@ -225,6 +243,7 @@ export default function Hero() {
           </Tooltip>
         ))}
       </div>
-    </Container>
+      </Container>
+    </div>
   );
 }

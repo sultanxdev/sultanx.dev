@@ -1,0 +1,2 @@
+$ next lint
+Γ£ö No ESLint warnings or errors
