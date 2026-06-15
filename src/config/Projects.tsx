@@ -19,6 +19,8 @@ import Kafka from '@/components/technologies/Kafka';
 import AWS from '@/components/technologies/AWS';
 import BullMQ from '@/components/technologies/BullMQ';
 import Redis from '@/components/technologies/Redis';
+import JWT from '@/components/technologies/JWT';
+import RabbitMQ from '@/components/technologies/RabbitMQ';
 
 export const projects: Project[] = [
   // 🥇 1. InterviewMate — strongest signal
@@ -49,32 +51,29 @@ export const projects: Project[] = [
     projectDetailsPageSlug: '/projects/interviewmate',
     isWorking: false,
   },
-   {
-    title: 'Parsona',
+  {
+    title: 'Sendry',
     description:
-      'AI-powered personal branding SaaS that generates persona-aligned social posts, schedules content, and tracks engagement analytics.',
-    image: '/project/demo.png',
-    //video: 'https://ik.imagekit.io/hokb3mrdr/notesbuddy.mp4?tr=orig',
-    link: 'https://parsona.sultanx.dev',  
+      'Event-driven API observability platform featuring asynchronous telemetry ingestion, RabbitMQ-powered processing, dead-letter queues, circuit breakers, idempotent event handling, dual-database analytics architecture, and real-time monitoring dashboards.',
+    image: '/project/sendry.png',
+    link: 'https://sendry.in',
     technologies: [
       { name: 'React', icon: <ReactIcon key="react" /> },
       { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
       { name: 'Express.js', icon: <ExpressJs key="express" /> },
       { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
-      { name: 'Mongoose', icon: <Mongoose key="mongoose" /> },  
-      { name: 'JavaScript', icon: <JavaScript key="javascript" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
-      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
+      { name: 'RabbitMQ', icon: <RabbitMQ key="rabbitmq" /> },
+      { name: 'JWT', icon: <JWT key="jwt" /> },
       { name: 'Docker', icon: <Docker key="docker" /> },
-      { name: 'Vercel', icon: <Vercel key="vercel" /> },
-      { name: 'Render', icon: <Render key="render" /> },
-
+      { name: 'Redis', icon: <Redis key="redis" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
     ],
-    github: 'https://github.com/sultanxdev/parsona',
-    live: 'https://parsona.sultanx.dev',
+    github: 'https://github.com/sultanxdev/sendry',
+    live: 'https://sendry.in',
     details: true,
-    projectDetailsPageSlug: '/projects/parsona',
-    isWorking: false,
+    projectDetailsPageSlug: '/projects/sendry',
+    isWorking: true,
   },
 
   // 🥈 2. Eventify — backend credibility
@@ -102,7 +101,7 @@ export const projects: Project[] = [
     live: 'https://github.com/sultanxdev/Eventify',
     details: true,
     projectDetailsPageSlug: '/projects/eventify',
-    isWorking: false,
+    isWorking: true,
   },
 
   // 🥇 1. Zyven — distributed systems backbone

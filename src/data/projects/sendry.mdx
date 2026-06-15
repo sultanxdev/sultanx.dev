@@ -1,0 +1,342 @@
+---
+title: 'Sendry — Event-Driven API Observability Platform'
+description: 'Event-driven API observability platform with asynchronous telemetry ingestion, RabbitMQ processing, DLQ handling, circuit breakers, and real-time monitoring dashboards.'
+image: '/project/sendry.png'
+technologies:
+  [
+    'React',
+    'Node.js',
+    'Express.js',
+    'MongoDB',
+    'PostgreSQL',
+    'RabbitMQ',
+    'JWT',
+    'Docker',
+    'Redis',
+    'Tailwind CSS',
+  ]
+github: 'https://github.com/sultanxdev/sendry'
+live: 'https://sendry.in'
+timeline: '3–4 months'
+role: 'Full Stack Developer'
+team: 'Solo'
+status: 'in-progress'
+featured: false
+isPublished: true
+---
+
+### Overview
+
+Sendry is a self-hosted API observability platform designed to help engineering teams monitor request traffic, latency, reliability, and operational health without impacting application performance.
+
+The platform provides a lightweight SDK that applications can integrate in minutes. API events are collected asynchronously, processed through RabbitMQ, aggregated into analytics stores, and visualized through a real-time dashboard.
+
+The primary design goal was simple:
+
+> Monitoring should never slow down the application being monitored.
+
+---
+
+## The Problem
+
+Most monitoring solutions are either:
+
+* Expensive
+* Complex to operate
+* Overkill for small engineering teams
+
+For many projects, teams only need answers to questions like:
+
+* Which endpoints are receiving the most traffic?
+* What is the current error rate?
+* Which services are experiencing latency spikes?
+* Which APIs are failing most frequently?
+
+Traditional approaches often introduce synchronous overhead by processing telemetry during request execution.
+
+I wanted to design a system where monitoring data collection remained completely asynchronous.
+
+---
+
+## Architecture
+
+### High-Level Flow
+
+```text
+Application
+      │
+      ▼
+Monitoring SDK
+      │
+      ▼
+Ingest API
+      │
+      ▼
+RabbitMQ Queue
+      │
+      ▼
+Consumer Workers
+      │
+      ├── MongoDB (Raw Events)
+      │
+      └── PostgreSQL (Aggregated Metrics)
+                     │
+                     ▼
+              Analytics API
+                     │
+                     ▼
+                Dashboard
+```
+
+The architecture follows an event-driven pattern where telemetry collection and analytics processing are completely decoupled.
+
+---
+
+## Key Features
+
+### API Monitoring SDK
+
+Applications integrate a lightweight Express middleware.
+
+The SDK automatically captures:
+
+* Endpoint
+* HTTP method
+* Status code
+* Latency
+* Client IP
+* User agent
+
+Metrics are sent asynchronously after the response has already been delivered.
+
+This guarantees zero impact on application response time.
+
+---
+
+### Event-Driven Ingestion
+
+Incoming telemetry is not processed immediately.
+
+Instead:
+
+1. API receives telemetry
+2. Event is validated
+3. Event is published to RabbitMQ
+4. API returns immediately with HTTP 202
+
+This allows the system to absorb traffic spikes without overwhelming downstream services.
+
+---
+
+### RabbitMQ Processing Pipeline
+
+The consumer service processes telemetry asynchronously.
+
+Features include:
+
+* Durable queues
+* Manual acknowledgements
+* Retry mechanisms
+* Exponential backoff
+* Dead-letter queues (DLQ)
+
+Failed events are never discarded.
+
+Events that exceed retry thresholds are automatically routed into a DLQ for inspection.
+
+---
+
+### Circuit Breaker Protection
+
+To prevent cascading failures, both producers and consumers use circuit breaker patterns.
+
+States:
+
+* Closed
+* Open
+* Half Open
+
+When downstream services become unavailable, the circuit opens and prevents unnecessary load from propagating through the system.
+
+---
+
+### Idempotent Event Processing
+
+RabbitMQ guarantees at-least-once delivery.
+
+This means duplicate messages can occur.
+
+To handle this safely:
+
+* Every event receives a unique identifier
+* Processed event IDs are tracked
+* Duplicate messages are ignored
+
+This ensures analytics remain accurate.
+
+---
+
+### Dual Database Architecture
+
+Different workloads require different storage models.
+
+#### MongoDB
+
+Stores raw telemetry events.
+
+Benefits:
+
+* Flexible schema
+* High write throughput
+* Event retention policies
+
+#### PostgreSQL
+
+Stores aggregated metrics.
+
+Benefits:
+
+* Fast analytical queries
+* Aggregations
+* Dashboard performance
+
+This separation allows the platform to optimize both write-heavy and read-heavy workloads independently.
+
+---
+
+### Analytics Dashboard
+
+The dashboard provides operational visibility into:
+
+* Request volume
+* Error rates
+* Average latency
+* Top endpoints
+* Service health
+
+Metrics are served from pre-aggregated PostgreSQL tables rather than expensive raw event scans.
+
+---
+
+## Engineering Challenges
+
+### Challenge 1 — Reliable Event Processing
+
+The system must avoid losing telemetry during failures.
+
+Solution:
+
+* Durable RabbitMQ queues
+* Retry policies
+* DLQ routing
+* Graceful shutdown procedures
+
+---
+
+### Challenge 2 — Traffic Spikes
+
+A sudden increase in traffic could overwhelm consumers.
+
+Solution:
+
+* Queue-based buffering
+* Consumer prefetch controls
+* Horizontal worker scaling
+
+---
+
+### Challenge 3 — Duplicate Deliveries
+
+Message brokers may redeliver messages.
+
+Solution:
+
+* Event IDs
+* Idempotent processing logic
+
+---
+
+### Challenge 4 — Efficient Analytics
+
+Scanning millions of raw events for every dashboard request is inefficient.
+
+Solution:
+
+* Incremental aggregation
+* PostgreSQL UPSERT operations
+* Time-bucketed metrics
+
+---
+
+## Production Features
+
+The platform includes several production-grade patterns:
+
+* JWT Authentication
+* API Key Management
+* Role-Based Access Control
+* Circuit Breakers
+* Retry with Exponential Backoff
+* Dead-Letter Queues
+* Structured Logging
+* Graceful Shutdown
+* Health Checks
+* Docker Deployment
+* Multi-Tenant Architecture
+
+---
+
+## Technology Stack
+
+### Frontend
+
+* React
+* Vite
+* Tailwind CSS
+* ApexCharts
+* TanStack Query
+
+### Backend
+
+* Node.js
+* Express.js
+
+### Databases
+
+* MongoDB
+* PostgreSQL
+
+### Messaging
+
+* RabbitMQ
+
+### Infrastructure
+
+* Docker
+* Docker Compose
+
+### Authentication
+
+* JWT
+* HTTP-only Cookies
+
+---
+
+## What I Learned
+
+Building Sendry taught me how production systems handle reliability challenges.
+
+Key lessons included:
+
+* Event-driven architecture
+* Message broker design
+* Retry strategies
+* Circuit breaker patterns
+* Idempotent processing
+* Telemetry pipelines
+* Analytics system design
+* Multi-tenant SaaS architecture
+
+More importantly, it reinforced a principle I now apply to every system:
+
+> Reliability is not a feature added later. It must be designed into the architecture from day one.
