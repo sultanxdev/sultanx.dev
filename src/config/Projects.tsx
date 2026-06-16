@@ -15,7 +15,6 @@ import Prisma from '@/components/technologies/Prisma';
 import JavaScript from '@/components/technologies/JavaScript';
 import Vercel from '@/components/technologies/Vercel';
 import Render from '@/components/technologies/Render';
-import Kafka from '@/components/technologies/Kafka';
 import AWS from '@/components/technologies/AWS';
 import BullMQ from '@/components/technologies/BullMQ';
 import Redis from '@/components/technologies/Redis';

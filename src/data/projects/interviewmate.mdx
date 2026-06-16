@@ -1,6 +1,7 @@
 ---
 title: 'InterviewMate — Voice-First AI Mock Interview Platform'
-description: 'InterviewMate is an AI-powered mock interview platform that lets users practice realistic interviews through live voice conversations'
+description: 'InterviewMate is an AI-powered mock interview platform that lets users practice realistic interviews through live voice conversations.'
+image: '/project/interviewmate-hero.png'
 technologies:
   [
     'React',
@@ -31,7 +32,7 @@ InterviewMate is an AI-powered mock interview platform that lets users practice 
 
 The platform is designed to solve a simple but important problem: most interview prep tools are static, generic, and disconnected from how real interviews actually feel. InterviewMate makes the experience more realistic by combining a voice-based AI interviewer, dynamic interview setup, transcript capture, and asynchronous analysis. The codebase uses a MERN architecture with custom JWT authentication, Vapi for live voice interactions, OpenRouter for LLM routing, Google Gemini for evaluation, and React 19 + Vite on the frontend.  
 
----
+
 
 ## Problem
 
@@ -43,7 +44,7 @@ Interview preparation usually fails in one of three ways:
 
 That creates a bad outcome: candidates go into interviews underprepared, anxious, and blind to their weak spots.
 
----
+
 
 ## Solution
 
@@ -58,16 +59,16 @@ InterviewMate solves this by giving users:
 
 The important architecture decision is that the interview session and the analysis pipeline are separated. The interview stays responsive, while the AI analysis runs after the session is complete. That avoids blocking the user while the AI is thinking. 
 
----
+
 ## Screenshots
 
-### 🖥️ Landing Page & Voice Sandbox
+### Landing Page & Voice Sandbox
 ![Landing Page & Live Simulator](/project/interviewmate-hero.png)
 
-### 📊 Performance Evaluation Dashboard
+### Performance Evaluation Dashboard
 ![Performance Evaluation Dashboard](/project/interviewmate-dashboard.png)
 
-### 🎙️ Setup Room & Active Session Workspace
+### Setup Room & Active Session Workspace
 ![Setup Room and Session Workspace](/project/interviewmate-pages.png)
 
 ## Why This Project Matters
@@ -87,7 +88,7 @@ It demonstrates:
 
 That combination is especially relevant for YC-backed companies, remote startups, and AI product teams. 
 
----
+
 
 ## Features
 
@@ -121,7 +122,6 @@ Users can revisit past interviews, view reports, and track progress.
 ### Performance Analytics
 The dashboard shows trends and feedback across multiple sessions.
 
----
 
 ## Tech Stack
 
@@ -154,13 +154,10 @@ The dashboard shows trends and feedback across multiple sessions.
 
 This matches the actual codebase, which uses React + Vite on the frontend, Express + Mongoose on the backend, custom JWT auth, Vapi for voice sessions, and OpenRouter → Gemini for analysis. 
 
----
-
 ### Interview Processing Flow
 ![Interview Processing Flow](/project/interviewmate-flow.png)
 
-**Caption:** Interview execution flow from session creation through voice interaction, transcript persistence, asynchronous AI evaluation, and final report generation.
----
+ Interview execution flow from session creation through voice interaction, transcript persistence, asynchronous AI evaluation, and final report generation.
 
 ## Core Engineering Decisions
 
@@ -184,8 +181,6 @@ The codebase uses custom JWT-based auth rather than a hosted auth provider, whic
 
 The project keeps the React frontend and Express backend as independent applications in the same codebase. That is a sensible structure for a solo-built product. 
 
----
-
 ## Product Flow
 
 1. User signs up or logs in.
@@ -198,8 +193,6 @@ The project keeps the React frontend and Express backend as independent applicat
 8. Report is saved in MongoDB.
 9. User reviews the result in the dashboard.
 10. User checks interview history and progress.
-
----
 
 ## Project Structure
 
@@ -226,8 +219,6 @@ interviewmate/
 ```
 
 This matches the actual codebase layout, which includes backend route/controller/service layers and a Vite-based React frontend with pages for sign-in, interview setup, live sessions, results, and history.
-
----
 
 ## Main Pages
 
@@ -256,25 +247,6 @@ It gives the user a clear journey:
 * improve
 
 That is the product loop.
-
----
-
-## API Endpoints
-
-### Auth
-
-* `POST /api/auth/register`
-* `POST /api/auth/login`
-* `GET /api/auth/me`
-
-### Interview
-
-* `POST /api/vapi-interview/start`
-* `GET /api/vapi-interview/report/:sessionId`
-* `POST /api/vapi-interview/report-from-transcript`
-* `POST /api/vapi-interview/retry-analysis`
-* `GET /api/vapi-interview/user`
----
 
 ## Environment Variables
 
