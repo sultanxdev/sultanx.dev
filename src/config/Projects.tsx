@@ -23,34 +23,11 @@ import JWT from '@/components/technologies/JWT';
 import RabbitMQ from '@/components/technologies/RabbitMQ';
 
 export const projects: Project[] = [
-  // 🥇 1. InterviewMate — strongest signal
-  {
-    title: 'Interviewmate',
-    description:
-      'Real-time AI interview simulation platform using WebSockets, streaming speech-to-text, and adaptive questioning for human-like interview practice.',
-    image: '/project/demo.png',
-    link: 'https://github.com/sultanxdev/interviewmate',
-    technologies: [
-      { name: 'React', icon: <ReactIcon key="react" /> },
-      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
-      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
-      { name: 'Mongoose', icon: <Mongoose key="mongoose" /> },
-      { name: 'Socket.IO', icon: <SocketIo key="socketio" /> },
-      { name: 'Express.js', icon: <ExpressJs key="express" /> },
-      { name: 'JavaScript', icon: <JavaScript key="javascript" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
-      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
-      { name: 'Docker', icon: <Docker key="docker" /> },
-      { name: 'Vercel', icon: <Vercel key="vercel" /> },
-      { name: 'Render', icon: <Render key="render" /> },
+  // ─── LIVE PROJECTS ───────────────────────────────────────────────────
 
-    ],
-    github: 'https://github.com/sultanxdev/interviewmate',
-    live: 'https://interviewmate.sultanx.dev',
-    details: true,
-    projectDetailsPageSlug: '/projects/interviewmate',
-    isWorking: false,
-  },
+
+
+  // ✅ 2. Sendry — Second LIVE / running project
   {
     title: 'Sendry',
     description:
@@ -75,36 +52,62 @@ export const projects: Project[] = [
     projectDetailsPageSlug: '/projects/sendry',
     isWorking: true,
   },
-
-  // 🥈 2. Eventify — backend credibility
+  // InterviewMate — AI interview simulator
   {
-    title: 'Eventify',
+    title: 'Interviewmate',
     description:
-      'Event-driven microservices order processing system implementing Saga orchestration, transactional outbox, retries, and DLQ for fault-tolerant workflows.',
+      'Real-time AI interview simulation platform using WebSockets, streaming speech-to-text, and adaptive questioning for human-like interview practice.',
     image: '/project/demo.png',
-    link: 'https://github.com/sultanxdev/Eventify',
+    link: 'https://github.com/sultanxdev/interviewmate',
     technologies: [
-      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
-
+      { name: 'React', icon: <ReactIcon key="react" /> },
       { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
-      { name: 'Express', icon: <ExpressJs key="express" /> },
-      { name: 'Kafka', icon: <Kafka key="kafka" /> },
-      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
-      { name: 'Prisma', icon: <Prisma key="prisma" /> },
-
+      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
+      { name: 'Mongoose', icon: <Mongoose key="mongoose" /> },
+      { name: 'Socket.IO', icon: <SocketIo key="socketio" /> },
+      { name: 'Express.js', icon: <ExpressJs key="express" /> },
+      { name: 'JavaScript', icon: <JavaScript key="javascript" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
       { name: 'Docker', icon: <Docker key="docker" /> },
       { name: 'Vercel', icon: <Vercel key="vercel" /> },
-      { name: 'AWS', icon: <AWS key="aws" /> },
-
+      { name: 'Render', icon: <Render key="render" /> },
     ],
-    github: 'https://github.com/sultanxdev/Eventify',
-    live: 'https://github.com/sultanxdev/Eventify',
+    github: 'https://github.com/sultanxdev/interviewmate',
+    live: 'https://interviewmate.sultanx.dev',
     details: true,
-    projectDetailsPageSlug: '/projects/eventify',
+    projectDetailsPageSlug: '/projects/interviewmate',
     isWorking: true,
   },
 
-  // 🥇 1. Zyven — distributed systems backbone
+  // 🚀 1. ClinicFlow AI — First flagship LIVE project
+  {
+    title: 'Clinicflow AI',
+    description:
+      'Vertical AI SaaS for dental clinics — AI voice receptionist answers every call, books appointments via LangGraph agent, sends WhatsApp reminders, and recovers missed leads. 24/7 automation replacing the front desk.',
+    image: '/project/demo.png',
+    link: 'https://clinicflow.ai',
+    technologies: [
+      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
+      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
+      { name: 'Redis', icon: <Redis key="redis" /> },
+      { name: 'BullMQ', icon: <BullMQ key="bullmq" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'AWS', icon: <AWS key="aws" /> },
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
+    ],
+    github: '',
+    live: 'https://clinicflow.ai',
+    details: true,
+    projectDetailsPageSlug: '/projects/clinicflow-ai',
+    isWorking: false,
+  },
+
+  // Zyvan — distributed systems backbone
   {
     title: 'Zyvan',
     description:
@@ -115,12 +118,10 @@ export const projects: Project[] = [
       { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
       { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
       { name: 'Express', icon: <ExpressJs key="express" /> },
-    
       { name: 'BullMQ', icon: <BullMQ key="bullmq" /> },
       { name: 'Redis', icon: <Redis key="redis" /> },
       { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
       { name: 'Prisma', icon: <Prisma key="prisma" /> },
-
       { name: 'Docker', icon: <Docker key="docker" /> },
       { name: 'AWS', icon: <AWS key="aws" /> },
       { name: 'Next.js', icon: <NextJs key="nextjs" /> },
@@ -128,37 +129,10 @@ export const projects: Project[] = [
       { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
       { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
     ],
-    live: 'https://www.zyvan.in',
+    live: 'https://www.zyvan.dev',
     details: true,
     projectDetailsPageSlug: '/projects/zyvan',
     isWorking: false,
   },
 
-
- 
-
-  /* 
-{
-    title: 'NotesBuddy',
-    description:
-      'A comprehensive study platform with notes, flashcards, quizzes, AI chatbot, and interactive learning tools',
-    image: '/project/notesbuddy.png',
-    //video: 'https://ik.imagekit.io/hokb3mrdr/notesbuddy.mp4?tr=orig',
-    link: 'https://notesbuddy.in',
-    technologies: [
-      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
-      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
-      { name: 'React', icon: <ReactIcon key="react" /> },
-      { name: 'Vercel', icon: <Vercel key="vercel" /> },
-      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
-      { name: 'shadcn/ui', icon: <Shadcn key="shadcn" /> },
-      { name: 'MDX', icon: <MDXIcon key="mdx" /> },
-    ],
-    github: 'https://github.com/ramxcodes/notesbuddy',
-    live: 'https://notesbuddy.in',
-    details: true,
-    projectDetailsPageSlug: '/projects/notesbuddy',
-    isWorking: true,
-  }*/
 ];

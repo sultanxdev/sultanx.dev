@@ -20,6 +20,7 @@ export interface ProjectCaseStudyFrontmatter {
   github: string;
   live: string;
   timeline: string;
+  deadline?: string;
   role: string;
   team?: string;
   status: 'completed' | 'in-progress' | 'archived';

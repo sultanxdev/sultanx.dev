@@ -25,6 +25,7 @@ export function ProjectContent({ frontmatter, content }: ProjectContentProps) {
     github,
     live,
     timeline,
+    deadline,
     role,
     team,
     status,
@@ -97,6 +98,14 @@ export function ProjectContent({ frontmatter, content }: ProjectContentProps) {
                   Team
                 </h5>
                 <p className="text-sm">{team}</p>
+              </div>
+            )}
+            {deadline && (
+              <div>
+                <h5 className="text-muted-foreground text-sm font-semibold">
+                  Target Deadline
+                </h5>
+                <p className="text-sm">{deadline}</p>
               </div>
             )}
             <div>
