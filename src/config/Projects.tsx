@@ -56,9 +56,9 @@ export const projects: Project[] = [
   {
     title: 'Interviewmate',
     description:
-      'Real-time AI interview simulation platform using WebSockets, streaming speech-to-text, and adaptive questioning for human-like interview practice.',
-    image: '/project/interviewmate-hero.pmg',
-    link: 'https://github.com/sultanxdev/interviewmate',
+      'InterviewMate is an AI-powered mock interview platform that lets users practice realistic interviews through live voice conversations...',
+    image: '/project/interviewmate-hero.png',
+    link: 'https://interviewmate-xi.vercel.app/',
     technologies: [
       { name: 'React', icon: <ReactIcon key="react" /> },
       { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
@@ -74,7 +74,7 @@ export const projects: Project[] = [
       { name: 'Render', icon: <Render key="render" /> },
     ],
     github: 'https://github.com/sultanxdev/interviewmate',
-    live: 'https://interviewmate.sultanx.dev',
+    live: 'https://interviewmate-xi.vercel.app/',
     details: true,
     projectDetailsPageSlug: '/projects/interviewmate',
     isWorking: true,
