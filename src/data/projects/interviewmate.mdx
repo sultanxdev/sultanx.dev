@@ -1,243 +1,391 @@
 ---
-title: 'InterviewMate — AI-Powered Mock Interview Platform'
-description: 'MERN stack AI mock interview platform — users conduct live voice interviews with an AI agent via Vapi.ai, receive per-question analysis and an 8-metric scoring report powered by OpenRouter and Google Gemini, with custom JWT authentication.'
-image: '/project/demo.png'
+title: 'InterviewMate — Voice-First AI Mock Interview Platform'
+description: 'AI-powered mock interview coach supporting low-latency WebRTC voice sessions, decoupled asynchronous Gemini evaluation pipelines, model failover routers, and interactive performance dashboards.'
+image: '/project/interviewmate-hero.png'
 technologies:
   [
     'React',
     'Node.js',
-    'MongoDB',
     'Express.js',
-    'JavaScript',
+    'MongoDB',
+    'JWT',
+    'Vapi.ai',
+    'OpenRouter',
+    'Gemini',
     'Tailwind CSS',
-    'Vite',
-    'Docker',
-    'Vercel',
-    'Render',
+    'Recharts',
   ]
 github: 'https://github.com/sultanxdev/interviewmate'
 live: 'https://interviewmate.sultanx.dev'
-timeline: '2–3 months'
-role: 'Full Stack Developer'
+timeline: '1–2 months'
+role: 'Full Stack Developer / AI Engineer'
 team: 'Solo'
-status: 'in-progress'
-featured: false
+status: 'completed'
+featured: true
 isPublished: true
 ---
 
+
 ## Overview
 
-**InterviewMate** is a full-stack AI mock interview platform built on the MERN stack. Users configure an interview session — selecting their target role, experience level, interview type, and AI interviewer agent — then conduct a live voice interview entirely in the browser. When the call ends, an AI analysis pipeline scores their performance across 8 dimensions and produces a detailed per-question feedback report.
+InterviewMate is an AI-powered mock interview platform that lets users practice realistic interviews through live voice conversations, then receive structured feedback and performance analysis after the session ends.
 
-The project is a **monorepo** with two independent apps: a Node.js/Express backend on port 5000, and a React 19 + Vite frontend on port 5173.
+The platform is designed to solve a simple but important problem: most interview prep tools are static, generic, and disconnected from how real interviews actually feel. InterviewMate makes the experience more realistic by combining a voice-based AI interviewer, dynamic interview setup, transcript capture, and asynchronous analysis. The codebase uses a MERN architecture with custom JWT authentication, Vapi for live voice interactions, OpenRouter for LLM routing, Google Gemini for evaluation, and React 19 + Vite on the frontend.  
 
-> Migrated from Clerk authentication to a custom JWT system post-launch to eliminate third-party auth dependency and reduce cost.
+---
+
+## Problem
+
+Interview preparation usually fails in one of three ways:
+
+- It is too shallow and only gives question lists.
+- It is too expensive to practice consistently with a human coach.
+- It gives vague feedback instead of clear, actionable improvement points.
+
+That creates a bad outcome: candidates go into interviews underprepared, anxious, and blind to their weak spots.
+
+---
+
+## Solution
+
+InterviewMate solves this by giving users:
+
+- a real-time voice interview experience
+- interview setup based on role, level, type, and context
+- live transcript capture
+- asynchronous AI evaluation after the interview ends
+- per-question feedback and overall scoring
+- interview history and progress tracking
+
+The important architecture decision is that the interview session and the analysis pipeline are separated. The interview stays responsive, while the AI analysis runs after the session is complete. That avoids blocking the user while the AI is thinking. 
+
+---
+## Screenshots
+
+### 🖥️ Landing Page & Voice Sandbox
+![Landing Page & Live Simulator](/project/interviewmate-hero.png)
+
+### 📊 Performance Evaluation Dashboard
+![Performance Evaluation Dashboard](/project/interviewmate-dashboard.png)
+
+### 🎙️ Setup Room & Active Session Workspace
+![Setup Room and Session Workspace](/project/interviewmate-pages.png)
+
+## Why This Project Matters
+
+This project is strong for portfolio and hiring purposes because it shows more than just CRUD or UI work.
+
+It demonstrates:
+
+- full-stack architecture
+- real-time user flows
+- authentication and protected routes
+- asynchronous processing
+- long-running AI jobs
+- transcript handling
+- reliability and recovery thinking
+- analytics-driven product design
+
+That combination is especially relevant for YC-backed companies, remote startups, and AI product teams. 
+
+---
+
+## Features
+
+### Real-Time Voice Interview
+Users can speak to an AI interviewer in a live interview session powered by Vapi.
+
+### Dynamic Interview Setup
+Users select:
+
+- role
+- experience level
+- interview type
+- interviewer persona
+- resume or job description context
+
+### Transcript Capture
+The full conversation is streamed, normalized, and saved for later analysis.
+
+### Async AI Evaluation
+After the interview ends, the transcript is sent to OpenRouter and evaluated by Gemini models.
+
+### Multi-Model Fallback
+If one model fails or rate-limits, the system falls back to the next one.
+
+### Secure Authentication
+The app uses custom JWT auth with protected routes and session restoration.
+
+### Interview History
+Users can revisit past interviews, view reports, and track progress.
+
+### Performance Analytics
+The dashboard shows trends and feedback across multiple sessions.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, Vite, TailwindCSS |
-| Backend | Node.js, Express.js |
-| Database | MongoDB + Mongoose |
-| Authentication | Custom JWT (bcrypt + jsonwebtoken) |
-| AI Voice | Vapi.ai Web SDK → OpenAI GPT-4o |
-| AI Analysis | OpenRouter → Google Gemini (3-model fallback) |
-| Voice Synthesis | OpenAI TTS + ElevenLabs (11 agents) |
+### Frontend
+- React 19
+- Vite
+- Tailwind CSS
+- Recharts
+
+### Backend
+- Node.js
+- Express.js
+- Mongoose
+- MongoDB
+
+### AI / Voice
+- Vapi
+- OpenRouter
+- Google Gemini
+
+### Authentication
+- Custom JWT
+- HTTP-only session handling on protected routes
+
+### Tooling
+- Docker
+- Async utilities
+- Custom error handling
+- API route organization
+
+This matches the actual codebase, which uses React + Vite on the frontend, Express + Mongoose on the backend, custom JWT auth, Vapi for voice sessions, and OpenRouter → Gemini for analysis. 
 
 ---
 
-## System Architecture
+### Interview Processing Flow
+![Interview Processing Flow](/project/interviewmate-flow.png)
 
-```mermaid
-graph TB
-    subgraph Browser["Browser — React 19 + Vite"]
-        UI[Dashboard / Setup / Result Pages]
-        VAPI_SDK[Vapi.ai Web SDK\nWebRTC voice session]
-        AUTH_CTX[AuthContext\nJWT stored in localStorage]
-    end
+**Caption:** Interview execution flow from session creation through voice interaction, transcript persistence, asynchronous AI evaluation, and final report generation.
+---
 
-    subgraph Backend["Backend — Node.js + Express :5000"]
-        AUTH_API["/api/auth\nregister · login · me"]
-        INTERVIEW_API["/api/vapi-interview\nstart · transcript · report · user"]
-        MIDDLEWARE[JWT Middleware\nbcrypt verify → req.user]
-    end
+## Core Engineering Decisions
 
-    subgraph AI["AI Services"]
-        VAPI_CLOUD[Vapi.ai Cloud\nOrchestrates WebRTC + GPT-4o]
-        OPENROUTER[OpenRouter\nGemini model fallback chain]
-        ANALYZER[InterviewResponseAnalyzer\nfire-and-forget IIFE]
-    end
+### 1. Voice Interview Is Separate From Analysis
 
-    subgraph DB["MongoDB Atlas"]
-        USERS[(users\nemail · bcrypt hash · names)]
-        SESSIONS[(interview_sessions\ntranscript · report · status)]
-    end
+The live interview must stay responsive. AI evaluation is expensive and slow, so it runs after the interview ends.
 
-    UI --> AUTH_API
-    AUTH_API --> USERS
-    AUTH_CTX -->|Bearer JWT| INTERVIEW_API
-    INTERVIEW_API --> MIDDLEWARE
-    MIDDLEWARE --> SESSIONS
-    UI --> VAPI_SDK
-    VAPI_SDK <-->|WebRTC audio| VAPI_CLOUD
-    VAPI_CLOUD -->|GPT-4o response| VAPI_SDK
-    INTERVIEW_API -->|POST transcript| ANALYZER
-    ANALYZER --> OPENROUTER
-    OPENROUTER --> SESSIONS
-    UI -->|Poll every 3s| INTERVIEW_API
+### 2. Transcript Is the Source of Truth
+
+The transcript is stored and reused for report generation. That makes the analysis step deterministic and recoverable.
+
+### 3. Multi-Model Fallback Improves Reliability
+
+If one Gemini endpoint fails or rate-limits, the system can move to the next model instead of breaking the workflow.
+
+### 4. Custom JWT Keeps Auth Simple and Controlled
+
+The codebase uses custom JWT-based auth rather than a hosted auth provider, which gives you full control over route protection and session restoration.
+
+### 5. Frontend and Backend Are Cleanly Separated
+
+The project keeps the React frontend and Express backend as independent applications in the same codebase. That is a sensible structure for a solo-built product. 
+
+---
+
+## Product Flow
+
+1. User signs up or logs in.
+2. User configures an interview.
+3. User starts a live voice interview.
+4. Vapi runs the conversation.
+5. Transcript is captured and saved.
+6. Backend sends transcript to OpenRouter.
+7. Gemini generates structured feedback.
+8. Report is saved in MongoDB.
+9. User reviews the result in the dashboard.
+10. User checks interview history and progress.
+
+---
+
+## Project Structure
+
+```text
+interviewmate/
+├── backend/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── services/
+│   └── utils/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── constants/
+│   │   ├── layout/
+│   │   └── pages/
+│   └── public/
+├── .env.example
+└── README.md
+```
+
+This matches the actual codebase layout, which includes backend route/controller/service layers and a Vite-based React frontend with pages for sign-in, interview setup, live sessions, results, and history.
+
+---
+
+## Main Pages
+
+### Public Pages
+
+* Home
+* Sign In
+* Sign Up
+
+### Authenticated Pages
+
+* Dashboard Overview
+* Create Interview
+* Interview Session
+* Interview Result
+* Past Interviews
+
+### Why this structure is good
+
+It gives the user a clear journey:
+
+* enter
+* configure
+* interview
+* analyze
+* improve
+
+That is the product loop.
+
+---
+
+## API Endpoints
+
+### Auth
+
+* `POST /api/auth/register`
+* `POST /api/auth/login`
+* `GET /api/auth/me`
+
+### Interview
+
+* `POST /api/vapi-interview/start`
+* `GET /api/vapi-interview/report/:sessionId`
+* `POST /api/vapi-interview/report-from-transcript`
+* `POST /api/vapi-interview/retry-analysis`
+* `GET /api/vapi-interview/user`
+---
+
+## Environment Variables
+
+### Backend
+
+```bash
+NODE_ENV=development
+PORT=5000
+MONGODB_URI=your_mongodb_connection_string
+JWT_SECRET=your_secure_jwt_secret
+JWT_EXPIRES_IN=7d
+VAPI_PUBLIC_KEY=your_vapi_public_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+```
+
+### Frontend
+
+```bash
+VITE_BACKEND_URL=http://localhost:5000
+VITE_VAPI_PUBLIC_KEY=your_vapi_public_key
 ```
 
 ---
 
-## Authentication & Session Flow
+## How to Run Locally
 
-```mermaid
-sequenceDiagram
-    participant U as 👤 User
-    participant FE as ⚛️ React Frontend
-    participant BE as 🖥️ Express Backend
-    participant DB as 🍃 MongoDB
+### 1. Clone the repository
 
-    Note over U,DB: === REGISTRATION / LOGIN ===
-
-    U->>FE: Submit email + password
-    FE->>BE: POST /api/auth/register\n{email, password, firstName, lastName}
-    BE->>DB: User.findOne({email}) — check uniqueness
-    BE->>BE: bcrypt.hash(password, 12)
-    BE->>DB: User.create({email, hashedPwd, ...})
-    BE->>BE: jwt.sign({userId}, JWT_SECRET, {expiresIn: "7d"})
-    BE-->>FE: {success: true, token, user}
-    FE->>FE: localStorage.setItem("im_token", token)\nsetUser(user), isSignedIn = true
-
-    Note over U,DB: === PROTECTED ROUTE RESTORE (on refresh) ===
-
-    FE->>FE: Read "im_token" from localStorage\nisLoaded = false → render null (no flash)
-    FE->>BE: GET /api/auth/me\nAuthorization: Bearer <token>
-    BE->>BE: jwt.verify(token, JWT_SECRET) → {userId}
-    BE->>DB: User.findById(userId).select("-password")
-    BE-->>FE: {success: true, user}
-    FE->>FE: setUser(user), isLoaded = true\nProtectedRoute renders page
+```bash
+git clone https://github.com/sultanxdev/interviewmate.git
+cd interviewmate
 ```
 
----
+### 2. Install dependencies
 
-## Interview Session & AI Analysis Pipeline
-
-```mermaid
-flowchart TD
-    SETUP([🎙️ CreateInterview Page\nRole · Level · Type · Agent · Resume/JD]) --> START
-
-    START["POST /api/vapi-interview/start\n+ JWT"]
-    START --> SESSION_INIT["DB: InterviewSession created\nstatus: 'initialized'"]
-    SESSION_INIT --> PROMPT["Build GPT-4o system prompt\nInject: role, level, agentName,\nresume/JD content, interview type rules"]
-    PROMPT --> RESP["Return: {sessionId, systemPrompt, vapiPublicKey}"]
-
-    RESP --> VAPI_CALL["Vapi.ai Web SDK\nvapi.start({\n  model: gpt-4o + systemPrompt,\n  voice: agent.provider + agent.voiceId,\n  firstMessageMode: assistant-speaks-first\n})"]
-
-    VAPI_CALL --> WEBRTC["🎧 Live WebRTC Voice Call\nUser speaks ↔ AI agent responds\nTranscript streamed via vapi.on('message')"]
-
-    WEBRTC --> END_DETECT{"End phrase detected\nin assistant text?\n'The interview is now concluded'"}
-    END_DETECT -->|No| WEBRTC
-    END_DETECT -->|Yes| STOP["vapi.stop()\nwait 2s silence → auto-disconnect"]
-
-    STOP --> SAVE_TX["POST /api/vapi-interview/report-from-transcript\n{sessionId, transcript[]}"]
-    SAVE_TX --> TX_SAVE["DB: Save formatted transcript string\nstatus → 'analysis_pending'"]
-    TX_SAVE --> RESP_200["Return 200 immediately\n{status: 'analysis_pending'}"]
-
-    RESP_200 --> IIFE["🔥 Fire-and-Forget IIFE\n(async () => { ... })()"]
-    RESP_200 --> POLL["Frontend polls every 3s\nGET /api/vapi-interview/report/:sessionId"]
-
-    IIFE --> MODEL1["Try: google/gemini-3-flash-preview\ntemperature: 0.3, timeout: 60s"]
-    MODEL1 -->|429 rate limit| MODEL2["Try: google/gemini-2.5-flash"]
-    MODEL2 -->|429 rate limit| MODEL3["Try: google/gemini-3.1-pro-preview"]
-    MODEL1 & MODEL2 & MODEL3 -->|Success| PARSE["extractJsonFromResponse()\nHandle markdown code blocks"]
-    PARSE --> COMPLETE["DB: Save report\nstatus → 'completed'"]
-    MODEL3 -->|Failure| FAILED["DB: status → 'analysis_failed'"]
-
-    COMPLETE --> POLL
-    POLL -->|status: completed| RESULT(["📊 InterviewResult Page\n8-metric scores · per-question feedback"])
-
-    style IIFE fill:#f59e0b,color:#000
-    style COMPLETE fill:#22c55e,color:#fff
-    style FAILED fill:#ef4444,color:#fff
-    style RESULT fill:#6366f1,color:#fff
+```bash
+cd backend && npm install
+cd ../frontend && npm install
 ```
 
+### 3. Create environment files
+
+Create `.env` files in both backend and frontend using the values above.
+
+### 4. Start the backend
+
+```bash
+cd backend
+npm run dev
+```
+
+### 5. Start the frontend
+
+```bash
+cd frontend
+npm run dev
+```
+
+### 6. Open the app
+
+```bash
+http://localhost:5173
+```
 ---
 
-## Key Features
+## Challenges
 
-### 11 AI Interviewer Agents
-
-Each agent has a distinct voice, personality, and visual identity. Voice synthesis is provided by OpenAI TTS, Vapi, or ElevenLabs — but all agents use **GPT-4o** as the LLM reasoning backbone:
-
-| Agent | Voice Provider | Style |
-|---|---|---|
-| Rohan | OpenAI (`echo`) | Default, professional |
-| Sophia | OpenAI (`nova`) | Warm, senior engineer |
-| Marcus | OpenAI (`onyx`) | Direct, technical |
-| Emma | OpenAI (`shimmer`) | Encouraging, detailed |
-| Elliot | Vapi | Formal, structured |
-| Rachel, Drew, Clyde, Mimi, Fin, Nicole | ElevenLabs | Diverse accent/tone variety |
-
-### Interview Types
-
-Four specialised GPT-4o system prompt variants:
-
-- **Technical** — DSA, system design, technology-specific depth
-- **Behavioral** — STAR method, soft skills, no code questions
-- **HR** — cultural fit, career goals, company alignment
-- **General** — balanced professional background + experience
-
-### 8-Metric AI Scoring Report
-
-After the call, Google Gemini analyses the full transcript and scores:
-
-`correctness` · `clarity` · `relevance` · `detail` · `efficiency` · `creativity` · `communication` · `problemSolving`
-
-Each metric is scored 0–100. Per-question breakdown includes: the question asked, the candidate's answer, the expected answer, an improved answer, and specific feedback.
-
-### Custom JWT Authentication
-
-Migrated away from Clerk to a self-built auth system:
-- `bcrypt.hash(password, 12)` on registration
-- 7-day JWT tokens stored in `localStorage` under key `im_token`
-- `GET /api/auth/me` restores session on page refresh — `ProtectedRoute` renders `null` (not a redirect) during the restore round-trip, eliminating any login-page flash for authenticated users
-
-### Fire-and-Forget AI Analysis
-
-The `/report-from-transcript` endpoint responds with `200` immediately — AI analysis runs in a background IIFE. This avoids HTTP timeout failures for expensive Gemini API calls (which can take 20–60 seconds). The frontend polls `/report/:sessionId` every 3 seconds until `status === "completed"`.
-
-### Global Vapi Singleton
-
-`globalVapiInstance` lives at module scope (outside React). This prevents React 18 StrictMode's double-mount from creating two simultaneous WebRTC sessions. A `globalVapiStopPromise` ensures any in-progress `stop()` completes before a new `start()` is called.
+* Building live voice interview sessions
+* Capturing partial and final transcript updates
+* Preventing blocked UI during AI analysis
+* Handling rate limits and fallback logic
+* Designing a clean interview session lifecycle
+* Showing actionable report data instead of generic text
+* Keeping authentication and route protection stable
 
 ---
 
-## Engineering Challenges
+## Learnings
 
-**Challenge 1 — Vapi Auto-Disconnect**
-Vapi calls don't have a native "end interview" trigger. Solution: the GPT-4o system prompt instructs the agent to say exactly *"The interview is now concluded. Goodbye!"* when finished. The frontend monitors the assistant transcript for this phrase, then polls `agentSpeakingRef` every 300ms and calls `vapi.stop()` after 2 seconds of silence.
+* Voice AI systems need strong state management.
+* Long-running AI jobs should be decoupled from the user interaction path.
+* Transcript structure matters more than raw audio.
+* AI output is only useful when it is parsed into structured feedback.
+* Product design matters as much as model quality.
+* Good architecture makes the app easier to extend later.
 
-**Challenge 2 — AI Analysis Timeout**
-OpenRouter calls for full-transcript analysis can take 20–60 seconds. Sending this synchronously would time out on Render (30s limit). Solution: the controller responds immediately and runs analysis in a fire-and-forget async IIFE that writes back to MongoDB when done.
+## Future Roadmap
 
-**Challenge 3 — Gemini Rate Limits**
-OpenRouter rate-limits Gemini models independently. Solution: `callOpenRouter()` iterates through 3 models in priority order — on HTTP `429` it skips to the next model, only throwing on non-rate-limit errors.
+### Voice Infrastructure
 
-**Challenge 4 — React StrictMode Double-Mount**
-React 18 StrictMode mounts components twice in development. With Vapi's WebRTC SDK, this would create two simultaneous call sessions. Solution: module-scope singleton prevents double initialisation entirely.
+- Deepgram STT integration
+- ElevenLabs TTS integration
+- Real-time interruption handling
+
+### AI Evaluation
+
+- Resume-aware interviews
+- Company-specific interview tracks
+- Adaptive follow-up questioning
+
+### Analytics
+
+- Historical score tracking
+- Skill trend analysis
+- Personalized improvement plans
+
+### Platform
+
+- PDF report exports
+- Team dashboards
+- Subscription management
 
 ---
-
-## What I Learned
-
-- Vapi.ai Web SDK integration — WebRTC call lifecycle, transcript streaming, volume events
-- Fire-and-forget async patterns in Express for long-running AI tasks
-- LLM prompt engineering for structured JSON output (8 scoring dimensions)
-- Custom JWT auth implementation with zero-flash session restore
-- OpenRouter API with multi-model fallback chains
-- React 18 StrictMode gotchas with stateful singletons
