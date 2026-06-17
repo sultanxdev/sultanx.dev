@@ -1,0 +1,439 @@
+---
+title: "Sendry: Building a Y Combinator-Grade API Observability Platform"
+description: "Deep dive into Sendry's architecture—a decoupled, event-driven API monitoring platform that captures high-throughput metrics with sub-2ms latency overhead and zero blocking."
+date: "2026-06-17"
+author: "Sultan Alam"
+category: "System Design"
+tags: ["distributed-systems", "nodejs", "api-monitoring", "event-driven", "rabbitmq", "backend"]
+featured: true
+---
+
+<div align="center">
+
+![Sendry Banner](https://img.shields.io/badge/Sendry-API%20Monitoring-A7E46A?style=for-the-badge&logo=radar&logoColor=222026)
+![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![MongoDB](https://img.shields.io/badge/MongoDB-6.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
+
+**Decoupled, zero-overhead API observability using RabbitMQ, MongoDB, and PostgreSQL.**
+
+</div>
+
+---
+
+# 🚀 Sendry: Production-Grade API Observability Platform
+
+Sendry is a **production-grade API monitoring engine** built to capture, aggregate, and visualize high-throughput API metrics without introducing latency overhead or blocking your application's request loops.
+
+By utilizing an **event-driven, decoupled ingest pipeline**, Sendry takes API hits via a zero-dependency SDK middleware, publishes them to a durable queue in under **2 milliseconds**, and processes saving operations asynchronously.
+
+## 🖼️ System Hero Layout
+
+![Sendry Hero](/project/sendry/hero.png)
+
+## 🏗️ System Architecture Details
+
+Sendry is architected specifically to solve the "monitoring overhead" problem, splitting ingestion, queuing, persistence, and querying into decoupled, scalable layers:
+
+1. **Ingest Endpoint**: Express API server receives raw hits, validates client API keys, and quickly pushes them to the queue buffer.
+2. **Buffer Queue (RabbitMQ)**: A message broker that absorbs traffic spikes and guarantees message delivery.
+3. **Background Worker (Consumer)**: A standalone Node.js process that continuously drains the queue, handles retries, and coordinates the dual-write database persistence.
+4. **Dual Databases**:
+   - **MongoDB**: Optimized for unstructured raw payloads (full request body/headers) with a 30-day auto-expiry (TTL) index.
+   - **PostgreSQL**: Stores structured, aggregated hourly time-series metrics for fast dashboard queries.
+
+![Sendry Architecture](/project/sendry/Architecture.png)
+
+---
+
+## 🔄 Ingest Sequence Flow
+
+The following sequence details how an API hit is captured, queued, and stored asynchronously without delaying the client's HTTP response.
+
+![Ingestion Sequence](/project/sendry/sequance.png)
+
+### How It Works Step-by-Step:
+
+1. **User Client** issues an API request to the **Monitored App**.
+2. **Sendry SDK Middleware** captures request start time and intercepts the response `'finish'` event.
+3. **Monitored App** immediately returns the response to the user.
+4. **SDK Middleware** fires an asynchronous, non-blocking `POST` log request to the **Sendry Ingest API**.
+5. **Ingest API** validates the API Key and publishes the payload to the **RabbitMQ queue**.
+6. **Ingest API** returns `202 Accepted` to the Monitored App in `<2ms`.
+7. The **Background Queue Worker** pulls the hit event, parses it, and writes:
+   - Raw logs to **MongoDB**
+   - Time-series aggregated counts to **PostgreSQL**
+
+---
+
+## Storage Strategy: Why Two Databases?
+
+### MongoDB: Raw Log Ingestion
+
+```javascript
+{
+  _id: ObjectId("..."),
+  serviceName: "order-service",
+  endpoint: "/api/orders",
+  method: "POST",
+  statusCode: 201,
+  latencyMs: 124.56,
+  requestHeaders: { ... },
+  requestBody: { ... },
+  responseBody: { ... },
+  timestamp: Date.now()
+  // ↑ Auto-expires after 30 days via TTL index
+}
+```
+
+**Why MongoDB?**
+- Schemaless (accepts any payload structure)
+- Fast unstructured writes
+- Built-in TTL indexes (auto-cleanup after 30 days)
+- Good for "log and forget" pattern
+
+### PostgreSQL: Time-Series Aggregations
+
+```sql
+-- Hourly bucketed metrics
+INSERT INTO metrics (service_name, endpoint, method, status_code, hour, count, avg_latency)
+VALUES ('order-service', '/orders', 'POST', 201, '2026-06-17 14:00:00', 1245, 124.56)
+ON CONFLICT (service_name, endpoint, method, status_code, hour)
+DO UPDATE SET
+  count = count + 1,
+  avg_latency = (avg_latency * old_count + NEW.latency) / (old_count + 1)
+```
+
+**Why PostgreSQL?**
+- Structured time-series queries (perfect for dashboards)
+- `INSERT...ON CONFLICT` upserts for efficient aggregation
+- Sub-millisecond range queries over months of data
+- ACID guarantees for analytical accuracy
+
+---
+
+## Production-Grade Resilience Engineering
+
+A Y Combinator-quality system **must handle failures gracefully**. Sendry implements three critical resilience patterns:
+
+### 1. Circuit Breaker (3-State Pattern)
+
+If RabbitMQ crashes, your monitored application **must not hang**.
+
+**States:**
+- **CLOSED** ✓ Normal operation, traffic flows to RabbitMQ
+- **OPEN** ✗ RabbitMQ errors exceed threshold (5 errors in 10s) → Ingest API fails-open, returns `503` without blocking
+- **HALF-OPEN** ⚡ After 30s cooldown, sends 2 test messages. If successful, closes breaker; else reopens
+
+**Outcome**: Monitored apps continue serving users even if Sendry is completely down.
+
+### 2. Consumer Exponential Backoff with Jitter
+
+When a database connection drops momentarily, retries must scale intelligently:
+
+$$\text{delay} = (\text{baseDelay} \times 2^{\text{attempt}}) \pm \text{randomJitter}$$
+
+**Why jitter?** Without it, all 10,000 queued retries hit the database simultaneously when it recovers (the "thundering herd"). Jitter distributes retries over time.
+
+### 3. Dead-Letter Queue (DLQ) Safeguard
+
+Messages that fail validation or exceed 3 write attempts are:
+- **Acknowledged** (removed from main queue)
+- **Routed to DLQ** with error headers
+- **Never blocks** active channels
+
+This prevents a single malformed payload from poisoning the entire queue.
+
+---
+
+## 📊 Database Entity Relationship Diagram
+
+![Entity Relationship Diagram](/project/sendry/er.png)
+
+### Storage Strategy:
+- **MongoDB TTL partition**: The `timestamp` field in MongoDB has an active `expireAfterSeconds: 2592000` index (30 days). Raw log collections self-clean, ensuring storage size doesn't grow unboundedly.
+- **PostgreSQL Upsert aggregations**: The background worker performs high-efficiency `INSERT INTO metrics ... ON CONFLICT (...) DO UPDATE` queries. This aggregates raw hits into hourly buckets, keeping analytical query scans extremely fast.
+
+---
+
+## 📊 Analytics Dashboard
+
+The React dashboard renders live charts, status breakdowns, and sorted endpoint performance tables using ApexCharts.
+
+![Dashboard Preview](/project/sendry/dashboard.png)
+
+---
+
+## 🔌 Developer SDK Integration
+
+Integrating Sendry into your Express app is trivial:
+
+```typescript
+// monitoring.ts - Zero dependencies
+import axios from 'axios';
+
+export function monitoringMiddleware(options = {}) {
+  const apiKey = options.apiKey || process.env.MONITORING_API_KEY;
+  const endpoint = options.endpoint || 'http://localhost:5000/api/hit';
+  const serviceName = options.serviceName || 'my-service';
+
+  return function (req, res, next) {
+    const start = process.hrtime();
+
+    // Hook into Express response finish event
+    res.on('finish', () => {
+      const diff = process.hrtime(start);
+      const latencyMs = (diff[0] * 1e3 + diff[1] * 1e-6);
+
+      const payload = {
+        serviceName,
+        endpoint: req.route?.path || req.path,
+        method: req.method,
+        statusCode: res.statusCode,
+        latencyMs: parseFloat(latencyMs.toFixed(2))
+      };
+
+      // Fire-and-forget: NEVER blocks application request loop
+      if (apiKey) {
+        axios.post(endpoint, payload, {
+          headers: { 'x-api-key': apiKey },
+          timeout: 3000  // Short timeout, fail silently
+        }).catch(() => {});  // Never bubble up errors
+      }
+    });
+
+    next();
+  };
+}
+```
+
+Usage in your Express app:
+
+```typescript
+import express from 'express';
+import { monitoringMiddleware } from './monitoring.js';
+
+const app = express();
+
+app.use(monitoringMiddleware({
+  serviceName: 'payment-service',
+  apiKey: process.env.MONITORING_API_KEY
+}));
+
+app.post('/payments', async (req, res) => {
+  // Your logic here
+  res.json({ status: 'processed' });
+  // Monitoring fires in background ✓
+});
+
+app.listen(3000);
+```
+
+**Key Design Choices:**
+- Uses Node's native `'finish'` event (no npm dependencies)
+- 3-second timeout (fails fast if Sendry is slow)
+- Silent failures (errors never bubble to your app)
+- Zero main-thread blocking
+
+---
+
+## Dashboard: Real-Time Observability
+
+The React dashboard (built with Vite + ApexCharts) provides:
+
+- **Live status breakdowns** (2xx, 3xx, 4xx, 5xx distribution)
+- **Endpoint performance tables** (sorted by latency)
+- **Time-series charts** (requests/min, error rate trends)
+- **Service health at a glance**
+
+All powered by PostgreSQL aggregated metrics for sub-100ms query response times.
+
+---
+
+## 📁 Project Directory Structure
+
+```
+sendry/
+├── server/                         # Backend API Server & Background Consumer
+│   ├── src/
+│   │   ├── server.js               # Express API entry point
+│   │   ├── services/
+│   │   │   ├── auth/               # JWT authentication & RBAC roles
+│   │   │   ├── ingest/             # Ingestion routes & RabbitMQ Event Producer
+│   │   │   ├── processor/          # RabbitMQ consumer (standalone background worker)
+│   │   │   ├── analytics/          # PostgreSQL analytics metrics queries
+│   │   │   └── client/             # API Key creation & client configuration
+│   │   └── shared/
+│   │       ├── config/             # DB & RabbitMQ connection managers
+│   │       ├── models/             # MongoDB Mongoose schemas
+│   │       ├── events/             # Circuit Breakers & Retry managers
+│   │       └── middlewares/        # JWT & API Key validation filters
+│   ├── scripts/
+│   │   └── init-postgres.sql       # PostgreSQL table schemas & metrics indexes
+│   ├── Dockerfile                  # API production image
+│   ├── Dockerfile.consumer         # Consumer background worker image
+│   └── docker-compose.yml          # Local infrastructure orchestration
+│
+├── dashboard/                      # Vite React SPA Dashboard
+│   ├── src/
+│   │   ├── App.jsx                 # Client routes & Auth gates
+│   │   ├── api/                    # Axios REST requests
+│   │   ├── components/             # Reusable UI widgets & ApexCharts
+│   │   ├── pages/                  # Overview and settings pages
+│   │   └── styles/                 # Custom Tailwind CSS global styling
+│   └── vercel.json                 # SPA path routing configuration for Vercel
+│
+└── demo/demo/                      # Sample Monitored Express API
+    ├── server.js                   # Mock API server
+    └── monitoring.js               # Zero-dependency SDK middleware
+```
+
+---
+
+## ⚡ Quick Start
+
+### 1. Spin up Local Infrastructure (Docker)
+Ensure Docker is installed, then spin up database and broker containers:
+```bash
+cd server
+docker-compose up -d postgres mongo rabbitmq
+```
+
+### 2. Configure Environment variables
+Create a `.env` file inside the `server/` directory:
+```bash
+cp .env.example .env
+```
+Ensure database URI configurations and RabbitMQ connection paths match your credentials.
+
+### 3. Start Backend Services
+Launch the Ingestion API server and the background queue consumer process:
+```bash
+# Terminal 1: Ingestion API
+cd server
+npm install
+npm run dev
+
+# Terminal 2: Queue Consumer Worker
+cd server
+node src/services/processor/consumer.js
+```
+
+### 4. Launch the Dashboard
+```bash
+cd dashboard
+npm install
+npm run dev
+```
+
+### 5. Onboard Admin
+Issue a `POST` request to register the initial administrator:
+```bash
+POST http://localhost:5000/api/auth/onboard
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "email": "admin@sendry.io",
+  "password": "SecurePassword123!"
+}
+```
+Login via `http://localhost:5173/login`, add a client profile, and generate a client **API Key**.
+
+---
+
+## 🛠️ Challenges & Solutions
+
+### 1. Cross-Domain Session Cookie Restrictions
+* **Challenge**: Modern browsers block cookies on cross-origin requests (`SameSite=None`) unless they are marked `Secure` and accessed over HTTPS. This created issues when testing the Vite frontend (`http://localhost:5173`) against the Express API (`http://localhost:5000`) and when deploying on Vercel/Render.
+* **Solution**: Implemented an automated cookie negotiation fallback inside the authentication middleware. The system inspects the environment and dynamically sets `sameSite: "lax"` and `secure: false` during local development, while switching to `sameSite: "none"` and `secure: true` on production HTTPS domains.
+
+### 2. Preventing Cascade Failures in Monitored Apps
+* **Challenge**: If the monitoring system slows down or goes offline, monitored client applications should not experience delays or request pileups in their Express routing loops.
+* **Solution**: Developed the SDK middleware around an asynchronous "fire-and-forget" model using Node's `'finish'` socket events. The Express response returns immediately to the client, while metric posts execute out-of-band with short connection timeouts (3000ms), ensuring zero main-thread blockages.
+
+### 3. Queue Consumer Idempotency & Duplicate Hits
+* **Challenge**: Under high-load network retries, the same API hit could be delivered twice to RabbitMQ, causing duplicate analytical entries in PostgreSQL.
+* **Solution**: Built an in-memory cache inside the consumer background worker using a capped `Set`. Before writing to the databases, the consumer checks the hit's unique hash in the set. The set is capped at 100,000 entries to prevent memory leaks while filtering out duplicate packets.
+
+---
+
+## ⚖️ System Design Trade-offs
+
+| Decision | Pros | Cons |
+| :--- | :--- | :--- |
+| **Dual-DB Split** | Optimal division of labor: MongoDB handles raw payload writes, while PostgreSQL performs structured, time-bucketed metric reads. | Higher operational overhead and hosting cost; requires maintaining two separate database connections and connection pool sizes. |
+| **RabbitMQ Event Buffer** | Extremely low latency overhead (under 2ms); native support for dead-letter exchanges (DLX) and easy channel routing. | Cannot match the high partition throughput and log-compaction capabilities of Apache Kafka for multi-consumer streams. |
+| **In-Memory Idempotency Set** | Low-latency duplicate checks with zero database read overhead. | Set is ephemeral; if the consumer worker crashes and restarts, state is lost, making eventual duplicate records possible. |
+
+---
+
+## 💡 Key Learnings
+
+1. **Decoupled Architecture Scalability**: Keeping database writes out of the active HTTP request loop is a fundamental pattern for building highly scalable systems. Pushing payloads to a message broker like RabbitMQ ensures the user's response time is unaffected by database write latencies.
+2. **Thundering Herd Protection**: In cloud environments, brief database dropouts are common. Implementing an exponential backoff retry strategy with a randomized jitter factor is critical to prevent recovered databases from being flooded with a storm of queued retries.
+3. **Graceful Fail-Open Systems**: Monitoring should never cause service downtime. Implementing a Circuit Breaker that fails open guarantees that if the queue becomes completely unreachable, the monitored application continues serving users normally.
+
+---
+
+## 📡 API Reference
+
+### Auth Endpoint Group
+| Method | Route | Description |
+|:---|:---|:---|
+| `POST` | `/api/auth/onboard` | One-time super admin profile registration |
+| `POST` | `/api/auth/register` | Create developer account |
+| `POST` | `/api/auth/login` | Log in and receive JWT HTTP-only cookie |
+| `POST` | `/api/auth/logout` | Revoke session and clear cookies |
+
+### Ingestion Group
+| Method | Route | Headers | Description |
+|:---|:---|:---|:---|
+| `POST` | `/api/hit` | `x-api-key` | Ingest API hit (returns 202 Accepted) |
+
+### Analytics Group
+| Method | Route | Auth | Description |
+|:---|:---|:---|:---|
+| `GET` | `/api/analytics/dashboard` | JWT | Get metric values, endpoint charts, and hourly series |
+
+---
+
+## 🌍 SaaS Deployment Guide
+
+To deploy the stack on cloud platforms:
+
+- **Frontend (React)**: Easily deployed on **Vercel** with client-side rewrites.
+- **Backend (API & Worker)**: Hosted on **Render** as a Web Service and Background Worker, utilizing managed **Neon PostgreSQL**, **MongoDB Atlas**, and **CloudAMQP** brokers.
+
+For detailed deployment instructions, see the official deployment guide in the repository.
+
+---
+
+## 🔮 Future Scope
+
+- **Real-Time Alerting Engine**: Integrate Slack, Discord, and PagerDuty webhooks to notify team members automatically when an endpoint's error rate spikes or average latency exceeds a specified threshold.
+- **Distributed Tracing (OpenTelemetry)**: Add support for trace propagation headers (e.g., `traceparent`), allowing developers to map API hits across microservice boundaries.
+- **Auto-Generating API Documentation**: Analyze incoming request/response schemas to dynamically construct OpenAPI/Swagger documentation directly from actual API traffic.
+- **Multi-Language SDKs**: Develop drop-in, zero-dependency middleware packages for other major backend environments, including Python (FastAPI/Django), Go (Gin), and Rust (Actix-web).
+
+---
+
+## Why This Matters
+
+Sendry represents a **paradigm shift** in how we think about API observability:
+
+✓ **Zero latency overhead** for your applications  
+✓ **Production-grade resilience** (circuit breakers, backoff, DLQ)  
+✓ **Scalable architecture** (event-driven, decoupled layers)  
+✓ **Simple developer experience** (one middleware function)  
+
+This is the foundation of building **Y Combinator-quality** distributed systems: elegant simplicity backed by rock-solid engineering.
+
+---
+
+**Resources**: 
+- [Sendry on GitHub](https://github.com/sultanxdev/sendry)
+- [Live Demo](https://sendry.in)
+- Built with ❤️ by Sultan Alam
