@@ -1,3 +1,3 @@
 export const resumeConfig = {
-  url: 'https://drive.google.com/file/d/13kXulPSTdJ9mT2ZXGdSymbKJi0zTA74K/view?usp=drive_link/preview',
+  url: 'https://drive.google.com/file/d/1SjEfFnbp-U1nJF2_R3IcDn_GzZ9dnzT-/view?usp=sharing',
 };
