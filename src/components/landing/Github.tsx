@@ -42,25 +42,6 @@ type ContributionItem = {
   level: 0 | 1 | 2 | 3 | 4;
 };
 
-type GitHubContributionResponse = {
-  date: string;
-  contributionCount: number;
-  contributionLevel:
-  | 'NONE'
-  | 'FIRST_QUARTILE'
-  | 'SECOND_QUARTILE'
-  | 'THIRD_QUARTILE'
-  | 'FOURTH_QUARTILE';
-};
-
-const contributionLevelMap = {
-  NONE: 0,
-  FIRST_QUARTILE: 1,
-  SECOND_QUARTILE: 2,
-  THIRD_QUARTILE: 3,
-  FOURTH_QUARTILE: 4,
-} as const;
-
 // Filter contributions to a specific year
 function filterByYear(
   contributions: ContributionItem[],

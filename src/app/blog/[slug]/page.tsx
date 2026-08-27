@@ -69,8 +69,6 @@ export async function generateMetadata({
       locale: 'en_US',
       publishedTime: date,
       modifiedTime: date,
-      authors: [siteConfig.author.name],
-      tags,
     },
     twitter: {
       card: 'summary_large_image',
