@@ -78,36 +78,34 @@ export const projects: Project[] = [
     projectDetailsPageSlug: '/projects/interviewmate',
     isWorking: true,
   },
-
-  // 🚀 1. ClinicFlow AI — First flagship LIVE project
   {
-    title: 'Clinicflow AI',
+    title: 'Waani',
     description:
-      'Vertical AI SaaS for dental clinics — AI voice receptionist answers every call, books appointments via LangGraph agent, sends WhatsApp reminders, and recovers missed leads. 24/7 automation replacing the front desk.',
-    image: '/project/demo.png',
-    link: 'https://clinicflow.ai',
+      'India-first voice AI infrastructure for developers, combining telephony, realtime audio streaming, speech-to-text, LLM orchestration, text-to-speech, conversation state, and provider abstraction for production voice agents.',
+    image: '/project/waani/hero.png',
+    link: '#',
     technologies: [
-      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
-      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
-      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
-      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
-      { name: 'Redis', icon: <Redis key="redis" /> },
-      { name: 'BullMQ', icon: <BullMQ key="bullmq" /> },
-      { name: 'Docker', icon: <Docker key="docker" /> },
-      { name: 'AWS', icon: <AWS key="aws" /> },
-      { name: 'React', icon: <ReactIcon key="react" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
-      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
+      { name: 'TypeScript', icon: <TypeScript key="waani-typescript" /> },
+      { name: 'Node.js', icon: <NodeJs key="waani-nodejs" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="waani-postgresql" /> },
+      { name: 'Express.js', icon: <ExpressJs key="express" /> },
+      { name: 'Next.js', icon: <NextJs key="waani-nextjs" /> },
+      { name: 'React', icon: <ReactIcon key="waani-react" /> },
+      { name: 'WebSockets', icon: <ReactIcon key="waani-websocket" /> },
+      { name: 'Prisma', icon: <Prisma key="waani-prisma" /> },
+      { name: 'Docker', icon: <Docker key="waani-docker" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="waani-tailwind" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="waani-shadcn" /> },
     ],
     github: '',
-    live: 'https://clinicflow.ai',
+    live: '',
     details: true,
-    projectDetailsPageSlug: '/projects/clinicflow-ai',
-    isWorking: false,
+    projectDetailsPageSlug: '/projects/waani',
+    isWorking: false, // that means this in development phase..
   },
-
-  // Zyvan — distributed systems backbone
   {
+    // Zyvan — distributed systems backbone
+
     title: 'Zyvan',
     description:
       'Production-grade webhook delivery infrastructure built on durable acknowledgment principles with idempotent ingestion, exponential retries, DLQ handling, and SSRF-safe outbound proxy architecture.',
@@ -133,5 +131,7 @@ export const projects: Project[] = [
     projectDetailsPageSlug: '/projects/zyvan',
     isWorking: false,
   },
-
 ];
+// that means this in development phase..
+
+
