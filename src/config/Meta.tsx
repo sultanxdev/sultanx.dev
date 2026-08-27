@@ -12,8 +12,8 @@ export interface PageMeta {
 // Base site configuration
 export const siteConfig = {
   name: heroConfig.name,
-  title: `${heroConfig.name} | Full Stack Engineer`,
-  description: `${heroConfig.name} is a Full Stack Engineer specializing in TypeScript, React, Next.js, Node.js, and PostgreSQL. Building scalable, production-ready web applications with clean architecture and strong UI quality.`,
+  title: `${heroConfig.name} | Full Stack & AI Engineer`,
+  description: `${heroConfig.name} is a Full Stack & AI Engineer specializing in TypeScript, React, Next.js, Node.js, AWS, and PostgreSQL. Building scalable, production-ready web applications with clean architecture and strong UI quality.`,
   url: 'https://www.sultanx.dev',
   ogImage: '/meta/opengraph-image.png',
   author: {
