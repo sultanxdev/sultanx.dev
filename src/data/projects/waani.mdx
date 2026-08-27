@@ -36,8 +36,6 @@ I'm building Waani to simplify the infrastructure behind voice AI applications. 
 
 The project focuses on the engineering problems that appear when voice AI moves beyond a demo — realtime communication, conversation state, provider failures, latency, authentication, and multi-tenant architecture.
 
----
-
 ## The Problem
 
 Building an AI phone agent looks simple from the outside, but the underlying system involves several moving parts.
@@ -57,8 +55,6 @@ The difficult part is making all of these components work together reliably whil
 
 I wanted to build the infrastructure layer that handles this complexity so developers can focus on the actual voice experience and business logic.
 
----
-
 ## The Solution
 
 Waani provides a unified developer-facing layer for building and operating AI voice agents.
@@ -75,15 +71,11 @@ A developer can:
 
 The goal is to make voice AI integration feel more like working with a developer platform than stitching together multiple infrastructure services.
 
----
-
 ## Architecture
 
 The system is designed around a realtime voice runtime that coordinates the telephony connection, audio stream, STT, LLM, and TTS layers.
 
 The application is intentionally modular so each provider can be replaced independently without changing the core conversation logic.
-
----
 
 ## What I Built
 
@@ -119,8 +111,6 @@ Designed the application around tenant isolation so each organization's agents, 
 
 Separated external providers behind interfaces so STT, LLM, TTS, and telephony providers can be changed independently.
 
----
-
 ## Technical Challenges
 
 ### Realtime Latency
@@ -131,8 +121,6 @@ A slow API response can be annoying. A slow voice response makes a conversation 
 
 Because of that, the system treats realtime communication and provider latency as first-class concerns.
 
----
-
 ### Provider Failures
 
 The voice pipeline depends on multiple external services.
@@ -141,15 +129,11 @@ A failure in STT, LLM, TTS, or telephony can interrupt the entire conversation.
 
 I added explicit timeout and failure handling so an external provider cannot keep a voice session waiting indefinitely.
 
----
-
 ### Conversation State
 
 A voice agent needs to understand the current turn while also remembering previous turns.
 
 Waani keeps conversation state separate from the transport layer so the voice session can continue across multiple interactions.
-
----
 
 ### Provider Dependency
 
@@ -159,15 +143,11 @@ Waani therefore uses provider-neutral interfaces instead of coupling business lo
 
 This makes future provider changes and fallback strategies much easier to introduce.
 
----
-
 ### Multi-Tenancy
 
 The platform is designed for multiple organizations using the same infrastructure.
 
 Tenant ownership is enforced at the backend and database layer rather than relying on frontend filtering.
-
----
 
 ## India-First
 
@@ -186,8 +166,6 @@ The initial focus is on:
 The goal is not simply to make a generic voice platform available in India.
 
 The longer-term goal is to understand and optimize the voice experience for Indian users.
-
----
 
 ## Developer Experience
 
@@ -212,8 +190,6 @@ const call = await waani.calls.create({
 });
 ```
 
----
-
 ## Current Status
 
 Waani is currently in active development.
@@ -223,8 +199,6 @@ The first milestone is deliberately focused on one complete workflow:
 Create an agent → connect an Indian phone number → make a real call → have a multi-turn AI conversation → save the transcript → inspect the call in the dashboard.
 
 More advanced capabilities such as provider fallback, multilingual support, voice evaluation, model routing, and advanced observability will come after the core voice loop is reliable.
-
----
 
 ## What I Learned
 
@@ -242,8 +216,6 @@ Building Waani has pushed me deeper into areas that are difficult to experience 
 
 The biggest lesson has been that a voice AI product is not just an AI model wrapped in an API. The surrounding realtime infrastructure is equally important.
 
----
-
 ## Future Direction
 
 The longer-term direction is to make Waani an India-first infrastructure layer for developers building production voice applications.
@@ -258,8 +230,6 @@ Planned areas include:
 - Model and provider routing
 - Advanced debugging and observability
 - Developer tooling
-
----
 
 ## Key Takeaway
 
