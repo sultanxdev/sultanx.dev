@@ -25,40 +25,27 @@ featured: true
 isPublished: true
 ---
 
-
 ## Overview
 
-InterviewMate is an AI-powered mock interview platform that lets users practice realistic interviews through live voice conversations, then receive structured feedback and performance analysis after the session ends.
+InterviewMate is a voice-first AI mock interview platform. Users speak to an AI interviewer in real time, and after the session ends, they receive structured feedback with per-question scores, improvement points, and progress tracking across sessions.
 
-The platform is designed to solve a simple but important problem: most interview prep tools are static, generic, and disconnected from how real interviews actually feel. InterviewMate makes the experience more realistic by combining a voice-based AI interviewer, dynamic interview setup, transcript capture, and asynchronous analysis. The codebase uses a MERN architecture with custom JWT authentication, Vapi for live voice interactions, OpenRouter for LLM routing, Google Gemini for evaluation, and React 19 + Vite on the frontend.  
+The goal was to make interview prep feel like the real thing — not a question bank or a chatbot, but a live conversation with an interviewer who asks follow-ups, holds context, and gives honest feedback at the end.
 
+## The Problem
 
+Most interview prep tools are static. They give you a list of questions, maybe some model answers, and call it practice. That doesn't help with the part that actually matters: thinking under pressure, speaking clearly, and staying composed in a real conversation.
 
-## Problem
+Hiring a human coach to practice consistently is expensive. AI chatbots feel nothing like a real interview. And most tools give feedback that's too vague to act on — "improve your communication" isn't useful.
 
-Interview preparation usually fails in one of three ways:
+## How It Works
 
-- It is too shallow and only gives question lists.
-- It is too expensive to practice consistently with a human coach.
-- It gives vague feedback instead of clear, actionable improvement points.
+The flow is straightforward from the user's side: configure an interview, start talking, review the report. Behind the scenes, two separate systems handle it.
 
-That creates a bad outcome: candidates go into interviews underprepared, anxious, and blind to their weak spots.
+The **interview session** runs through Vapi, which manages the live voice conversation in real time. The full transcript is captured and saved as the session progresses.
 
+Once the interview ends, the **analysis pipeline** kicks in asynchronously. The transcript goes to OpenRouter, gets evaluated by Gemini, and comes back as structured feedback — per-question scores, strengths, areas to improve, and an overall performance summary. The user sees their results a few moments later.
 
-
-## Solution
-
-InterviewMate solves this by giving users:
-
-- a real-time voice interview experience
-- interview setup based on role, level, type, and context
-- live transcript capture
-- asynchronous AI evaluation after the interview ends
-- per-question feedback and overall scoring
-- interview history and progress tracking
-
-The important architecture decision is that the interview session and the analysis pipeline are separated. The interview stays responsive, while the AI analysis runs after the session is complete. That avoids blocking the user while the AI is thinking. 
-
+Keeping these two systems separate was the most important architectural decision. The live session stays fast and responsive because it never waits on AI analysis. And the analysis step is deterministic — it always works from the same saved transcript, so if something fails, it can be retried cleanly.
 
 ## Screenshots
 
@@ -71,292 +58,68 @@ The important architecture decision is that the interview session and the analys
 ### Setup Room & Active Session Workspace
 ![Setup Room and Session Workspace](/project/interviewmate-pages.png)
 
-## Why This Project Matters
-
-This project is strong for portfolio and hiring purposes because it shows more than just CRUD or UI work.
-
-It demonstrates:
-
-- full-stack architecture
-- real-time user flows
-- authentication and protected routes
-- asynchronous processing
-- long-running AI jobs
-- transcript handling
-- reliability and recovery thinking
-- analytics-driven product design
-
-That combination is especially relevant for YC-backed companies, remote startups, and AI product teams. 
-
-
-
-## Features
-
-### Real-Time Voice Interview
-Users can speak to an AI interviewer in a live interview session powered by Vapi.
-
-### Dynamic Interview Setup
-Users select:
-
-- role
-- experience level
-- interview type
-- interviewer persona
-- resume or job description context
-
-### Transcript Capture
-The full conversation is streamed, normalized, and saved for later analysis.
-
-### Async AI Evaluation
-After the interview ends, the transcript is sent to OpenRouter and evaluated by Gemini models.
-
-### Multi-Model Fallback
-If one model fails or rate-limits, the system falls back to the next one.
-
-### Secure Authentication
-The app uses custom JWT auth with protected routes and session restoration.
-
-### Interview History
-Users can revisit past interviews, view reports, and track progress.
-
-### Performance Analytics
-The dashboard shows trends and feedback across multiple sessions.
-
-
-## Tech Stack
-
-### Frontend
-- React 19
-- Vite
-- Tailwind CSS
-- Recharts
-
-### Backend
-- Node.js
-- Express.js
-- Mongoose
-- MongoDB
-
-### AI / Voice
-- Vapi
-- OpenRouter
-- Google Gemini
-
-### Authentication
-- Custom JWT
-- HTTP-only session handling on protected routes
-
-### Tooling
-- Docker
-- Async utilities
-- Custom error handling
-- API route organization
-
-This matches the actual codebase, which uses React + Vite on the frontend, Express + Mongoose on the backend, custom JWT auth, Vapi for voice sessions, and OpenRouter → Gemini for analysis. 
-
 ### Interview Processing Flow
 ![Interview Processing Flow](/project/interviewmate-flow.png)
 
- Interview execution flow from session creation through voice interaction, transcript persistence, asynchronous AI evaluation, and final report generation.
+## What I Built
 
-## Core Engineering Decisions
+### Real-Time Voice Interview
 
-### 1. Voice Interview Is Separate From Analysis
+A live voice interview session powered by Vapi. The AI interviewer asks questions, listens to responses, handles follow-ups, and manages the conversation flow naturally. Users speak — the AI responds.
 
-The live interview must stay responsive. AI evaluation is expensive and slow, so it runs after the interview ends.
+### Dynamic Interview Setup
 
-### 2. Transcript Is the Source of Truth
+Users configure the interview before it starts: role, experience level, interview type, interviewer persona, and optional resume or job description context. The AI uses this to tailor the questions and tone of the session.
 
-The transcript is stored and reused for report generation. That makes the analysis step deterministic and recoverable.
+### Transcript Capture
 
-### 3. Multi-Model Fallback Improves Reliability
+The full conversation is streamed, normalized, and persisted as the session runs. The transcript becomes the source of truth for everything that follows — analysis, reports, and history.
 
-If one Gemini endpoint fails or rate-limits, the system can move to the next model instead of breaking the workflow.
+### Async AI Evaluation
 
-### 4. Custom JWT Keeps Auth Simple and Controlled
+After the interview ends, the transcript is evaluated by Gemini through OpenRouter. The analysis returns structured data: per-question feedback, scores, strengths, weak spots, and an overall performance summary. It runs after the session, never during.
 
-The codebase uses custom JWT-based auth rather than a hosted auth provider, which gives you full control over route protection and session restoration.
+### Multi-Model Fallback
 
-### 5. Frontend and Backend Are Cleanly Separated
+If one Gemini model fails or hits a rate limit, the system automatically moves to the next model in the chain. The user's report still gets generated — the failure is handled silently.
 
-The project keeps the React frontend and Express backend as independent applications in the same codebase. That is a sensible structure for a solo-built product. 
+### Custom JWT Authentication
 
-## Product Flow
+Full authentication built from scratch: signup, login, HTTP-only session cookies, protected routes, and session restoration. No third-party auth provider — just full control over the auth layer.
 
-1. User signs up or logs in.
-2. User configures an interview.
-3. User starts a live voice interview.
-4. Vapi runs the conversation.
-5. Transcript is captured and saved.
-6. Backend sends transcript to OpenRouter.
-7. Gemini generates structured feedback.
-8. Report is saved in MongoDB.
-9. User reviews the result in the dashboard.
-10. User checks interview history and progress.
+### Interview History & Analytics
 
-## Project Structure
+Users can revisit past interviews, read their reports, and see performance trends across sessions. The dashboard shows how scores evolve over time and where improvement is happening.
 
-```text
-interviewmate/
-├── backend/
-│   ├── config/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   └── utils/
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── constants/
-│   │   ├── layout/
-│   │   └── pages/
-│   └── public/
-├── .env.example
-└── README.md
-```
+## Technical Challenges
 
-This matches the actual codebase layout, which includes backend route/controller/service layers and a Vite-based React frontend with pages for sign-in, interview setup, live sessions, results, and history.
+### Keeping the live session fast
 
-## Main Pages
+AI evaluation takes time. If the session waited for analysis before returning to the user, the experience would feel broken. The solution was to decouple them entirely — the interview ends, the transcript is saved, and the analysis runs in the background. The user gets their report when it's ready, not when the interview finishes.
 
-### Public Pages
+### Handling AI reliability
 
-* Home
-* Sign In
-* Sign Up
+Language model APIs fail. They rate-limit, they time out, they return malformed responses. Building a multi-model fallback through OpenRouter meant the evaluation pipeline could survive individual model failures without the user ever knowing. The structure of the prompt also matters — asking for structured JSON output made the results parseable and consistent.
 
-### Authenticated Pages
+### Transcript normalization
 
-* Dashboard Overview
-* Create Interview
-* Interview Session
-* Interview Result
-* Past Interviews
+Vapi streams partial and final transcript updates in real time. Getting a clean, ordered, speaker-attributed transcript out of that stream required careful normalization before it could be reliably sent for analysis.
 
-### Why this structure is good
+### Session lifecycle design
 
-It gives the user a clear journey:
+A voice interview session has more states than a typical web interaction: configuring, waiting, in-progress, completed, analyzing, failed. Designing a session lifecycle that handled each of those states correctly — and recovered gracefully from failures at any point — was one of the more complex parts of the backend.
 
-* enter
-* configure
-* interview
-* analyze
-* improve
+## What I Learned
 
-That is the product loop.
+This project pushed me into parts of full-stack development that most projects don't touch — real-time voice, long-running AI jobs, and asynchronous pipelines where each step depends on the last.
 
-## Environment Variables
+The biggest shift in thinking: voice AI products aren't just AI wrapped in a UI. The session management, transcript handling, and reliability patterns around the AI layer are just as important as the model itself. Getting the model to produce good output is one problem. Making sure that output always reaches the user — even when things fail — is a separate and harder problem.
 
-### Backend
+## Future Direction
 
-```bash
-NODE_ENV=development
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_secure_jwt_secret
-JWT_EXPIRES_IN=7d
-VAPI_PUBLIC_KEY=your_vapi_public_key
-OPENROUTER_API_KEY=your_openrouter_api_key
-```
-
-### Frontend
-
-```bash
-VITE_BACKEND_URL=http://localhost:5000
-VITE_VAPI_PUBLIC_KEY=your_vapi_public_key
-```
-
----
-
-## How to Run Locally
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/sultanxdev/interviewmate.git
-cd interviewmate
-```
-
-### 2. Install dependencies
-
-```bash
-cd backend && npm install
-cd ../frontend && npm install
-```
-
-### 3. Create environment files
-
-Create `.env` files in both backend and frontend using the values above.
-
-### 4. Start the backend
-
-```bash
-cd backend
-npm run dev
-```
-
-### 5. Start the frontend
-
-```bash
-cd frontend
-npm run dev
-```
-
-### 6. Open the app
-
-```bash
-http://localhost:5173
-```
----
-
-## Challenges
-
-* Building live voice interview sessions
-* Capturing partial and final transcript updates
-* Preventing blocked UI during AI analysis
-* Handling rate limits and fallback logic
-* Designing a clean interview session lifecycle
-* Showing actionable report data instead of generic text
-* Keeping authentication and route protection stable
-
----
-
-## Learnings
-
-* Voice AI systems need strong state management.
-* Long-running AI jobs should be decoupled from the user interaction path.
-* Transcript structure matters more than raw audio.
-* AI output is only useful when it is parsed into structured feedback.
-* Product design matters as much as model quality.
-* Good architecture makes the app easier to extend later.
-
-## Future Roadmap
-
-### Voice Infrastructure
-
-- Deepgram STT integration
-- ElevenLabs TTS integration
+- Resume-aware and company-specific interview tracks
+- Deepgram STT and ElevenLabs TTS for a fully custom voice pipeline
 - Real-time interruption handling
-
-### AI Evaluation
-
-- Resume-aware interviews
-- Company-specific interview tracks
-- Adaptive follow-up questioning
-
-### Analytics
-
-- Historical score tracking
-- Skill trend analysis
-- Personalized improvement plans
-
-### Platform
-
-- PDF report exports
-- Team dashboards
-- Subscription management
-
----
+- Adaptive follow-up questioning based on user responses
+- PDF report exports and team dashboards
+- Historical skill trend analysis and personalized improvement plans
