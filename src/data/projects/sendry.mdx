@@ -27,409 +27,112 @@ isPublished: true
 
 ## Overview
 
-Sendry is a production-grade, self-hosted API observability platform engineered to capture, aggregate, and visualize high-throughput API metrics without introducing latency overhead or blocking application request loops.
+Sendry is a self-hosted API observability platform that captures, processes, and visualizes high-throughput API metrics — without adding any latency to the applications it monitors.
 
-The platform solves a fundamental problem in modern software engineering: how to monitor systems comprehensively while maintaining zero performance impact on the applications being monitored.
+Most monitoring tools either cost too much, require a dedicated DevOps team to operate, or slow down the very systems they're supposed to observe. Sendry was built to solve all three of those problems at once.
 
-By leveraging an event-driven, fully decoupled architecture, Sendry ingests API telemetry in under 2 milliseconds, publishes events to a durable message queue, and processes analytics asynchronously without touching the critical path of production requests.
-
-**Core Design Principle:**
-> Observability systems must never compromise the reliability or performance of the systems they monitor.
+The core idea is simple: telemetry should never block the request path. By separating ingestion from processing, Sendry can ingest events in under 2ms and handle everything else — aggregation, storage, dashboards — asynchronously in the background.
 
 ## The Problem
 
-Most observability platforms fall into one of three categories:
+Existing observability solutions fall into three frustrating categories:
 
-**Category 1: Expensive SaaS Solutions**
-Enterprise APM tools charge premium rates per host or per-event. For teams with high traffic volumes, costs become prohibitive. Monthly bills can exceed infrastructure costs themselves.
+**Expensive SaaS tools** that charge per event at scale, with monthly bills that often exceed infrastructure costs themselves.
 
-**Category 2: Complex Self-Hosted Systems**
-Open-source alternatives like Prometheus or ELK require significant operational expertise and infrastructure investment. They demand dedicated DevOps resources to maintain, scale, and troubleshoot.
+**Complex open-source stacks** like Prometheus or ELK that demand dedicated DevOps resources and significant operational overhead.
 
-**Category 3: Performance-Blocking Solutions**
-Synchronous instrumentation introduces measurable latency. Every database write, every HTTP call, and every aggregation operation during request execution delays the response to users. This creates an unacceptable trade-off between visibility and performance.
+**Synchronous instrumentation** that writes to databases during the request lifecycle, adding measurable latency to production applications.
 
-### What Engineers Actually Need
+What most engineering teams actually need is simple: which endpoints are slow, where errors are spiking, and which services are degrading — without paying premium rates or running a separate ops team to get those answers.
 
-Teams don't require enterprise APM complexity. They need answers to operational questions:
+## How It Works
 
-- Which API endpoints generate the most traffic?
-- What is the current system error rate?
-- Which services experience performance degradation?
-- Where are the reliability bottlenecks?
+Sendry sits between an application and its metrics. A lightweight SDK middleware captures request data and sends it to the ingestion API after the HTTP response is already delivered to the user — so there is zero impact on application performance.
 
-Sendry was designed to provide precisely these insights without the complexity, cost, or performance penalty of existing solutions.
+From there, the pipeline takes over:
 
----
+1. Ingest API validates the API key and publishes the event to RabbitMQ
+2. Returns HTTP 202 immediately — no waiting
+3. Background consumer pulls from the queue independently
+4. Event is deduplicated, validated, and written to both databases
+5. Dashboard queries serve from pre-aggregated PostgreSQL tables
 
-## System Architecture
+The result is a system that handles 10,000+ events per second on commodity hardware, with ingestion latency under 2ms.
 
-### Design Overview
-
-Sendry implements a four-layer event-driven architecture that completely decouples telemetry ingestion from data persistence and analytics processing:
-
-```
-Production Application
-        │
-        ├─ Sendry SDK Middleware (Captures metrics)
-        │
-        ▼
-Ingestion API (Express.js)
-        │
-        ├─ API Key Validation
-        ├─ Payload Parsing
-        │
-        ▼
-RabbitMQ Message Queue
-        │
-        ├─ Durable buffering
-        ├─ Traffic spike absorption
-        │
-        ▼
-Background Consumer Worker
-        │
-        ├─ Circuit breaker protection
-        ├─ Retry mechanisms
-        ├─ Deduplication logic
-        │
-        ├──────────────────┬──────────────────┐
-        │                  │                  │
-        ▼                  ▼                  ▼
-    MongoDB          PostgreSQL         Dead-Letter Queue
-   (Raw Events)    (Aggregated Metrics)   (Failed Events)
-        │                  │                  │
-        └──────────────────┴──────────────────┘
-                     │
-                     ▼
-              Analytics API
-                     │
-                     ▼
-            Real-Time Dashboard
-```
-
-### Layer Responsibilities
-
-**Ingest Layer:** Validates incoming telemetry, verifies API credentials, and publishes events to the message queue. Returns immediately with a 202 Accepted response, guaranteeing sub-2ms response times regardless of downstream processing load.
-
-**Queue Layer:** RabbitMQ absorbs traffic spikes and provides durable storage. If consumer workers become overwhelmed, the queue buffers events without blocking the production application. Implements manual acknowledgments to ensure no events are lost during failures.
-
-**Processing Layer:** Background consumer workers pull events from the queue, validate schemas, perform deduplication, and coordinate dual-write persistence. Implements exponential backoff with jitter to handle transient database failures gracefully.
-
-**Storage Layer:** MongoDB stores raw, unstructured event payloads with automatic 30-day expiration. PostgreSQL maintains pre-aggregated hourly time-series metrics optimized for analytical queries. This separation allows independent optimization of write-heavy and read-heavy workloads.
-
-### Architecture Diagrams
+## Architecture
 
 ![System Architecture](/project/sendry/Architecture.png)
 
 ![Ingestion Sequence](/project/sendry/sequance.png)
 
----
+## What I Built
 
-## Core Technical Features
+### Lightweight SDK Middleware
 
-### Lightweight Monitoring SDK
+A minimal Express.js middleware that captures request method, endpoint, status code, latency, IP, and payload sizes — then sends telemetry asynchronously after the response is delivered. Zero performance impact by design.
 
-Applications integrate a minimal Express.js middleware that automatically captures relevant telemetry:
+### Event-Driven Ingestion Pipeline
 
-- Request endpoint and HTTP method
-- Response status code
-- Latency measurement (sub-millisecond precision)
-- Client IP address and user agent
-- Request size and response size
+The ingestion API never touches a database. It validates the API key, publishes to RabbitMQ, and immediately returns 202 Accepted. All processing happens downstream, independently of the request.
 
-Critically, metrics are collected and sent asynchronously after the HTTP response has already been delivered to the client. This guarantees zero impact on application response times.
+### Circuit Breaker
 
-### Decoupled Event Processing Pipeline
+Both the ingestion layer and consumer implement a three-state circuit breaker. If RabbitMQ goes down, the API returns 503 immediately instead of hanging. Infrastructure failures never cascade into application failures.
 
-Rather than processing telemetry synchronously, Sendry implements an event-driven architecture:
+### Idempotent Message Processing
 
-1. Ingest API receives telemetry payload
-2. Validates API key against credential store
-3. Publishes event to RabbitMQ queue
-4. Returns HTTP 202 Accepted immediately
-5. Consumer pulls from queue independently
-6. Processes and persists to dual databases
-
-This separation means traffic spikes are absorbed by the queue without overwhelming the application. Peak loads are handled gracefully through buffering rather than backpressure.
-
-### Production-Grade Message Processing
-
-RabbitMQ consumer implements multiple reliability patterns:
-
-- Durable queues with persistent message storage
-- Manual acknowledgments to prevent message loss
-- Exponential backoff retry strategy with randomized jitter
-- Dead-letter queues for unprocessable messages
-- Graceful shutdown procedures
-
-Unprocessable events (schema validation failures or repeated processing errors) are automatically routed to a dead-letter queue for manual inspection rather than blocking the primary queue.
-
-### Circuit Breaker Pattern
-
-To prevent cascading failures, both the ingestion API and consumer implement three-state circuit breakers:
-
-- **Closed State:** Normal operation, requests flow to downstream systems
-- **Open State:** Threshold exceeded (5 errors in 10 seconds), requests immediately fail without attempting downstream calls
-- **Half-Open State:** After 30-second cooldown, test messages verify recovery
-
-If RabbitMQ crashes, the Ingest API fails open and returns 503 Service Unavailable without hanging or blocking the production application. This guarantees that monitoring infrastructure failures never propagate to user-facing systems.
-
-### Idempotent Event Processing
-
-Message brokers guarantee at-least-once delivery, meaning duplicate messages can occur. Sendry handles this safely through:
-
-- Unique event identifiers on every message
-- In-memory cache of processed event IDs (capped at 100,000 entries)
-- Deduplication check before database writes
-
-This ensures analytics remain accurate even when network retries deliver duplicate messages.
+RabbitMQ guarantees at-least-once delivery, which means duplicates can happen. Every event gets a unique hash, and an in-memory deduplication cache prevents duplicate writes to the database. Analytics stay accurate even under retry conditions.
 
 ### Dual Database Architecture
 
-Different data access patterns require different storage engines:
-
-**MongoDB:** Stores raw, unstructured event payloads with full request/response bodies. Enables schemaless ingestion and flexible queries. Automatically expires records after 30 days using TTL indexes, preventing unbounded storage growth.
-
-**PostgreSQL:** Stores pre-aggregated hourly time-series metrics. Enables fast analytical queries optimized for dashboard rendering. Uses efficient UPSERT operations to atomically merge raw events into hourly buckets.
-
-This separation allows optimization of write throughput (MongoDB) independently from query performance (PostgreSQL).
-
-#### Database Schema Visualization
+MongoDB stores raw event payloads with a 30-day TTL — schemaless, write-optimized, auto-expiring. PostgreSQL stores hourly pre-aggregated metrics — read-optimized, fast for dashboard queries. The separation means dashboard queries complete in 50–100ms regardless of total event volume.
 
 ![Database Entity Relationships](/project/sendry/er.png)
 
-### Real-Time Analytics Dashboard
+### Real-Time Dashboard
 
-The React-based dashboard provides operational visibility:
-
-- Request volume trends over time
-- Error rate distribution by status code
-- Average, p50, p95, p99 latency metrics
-- Top endpoints ranked by traffic
-- Service health status indicators
-- Endpoint performance comparison tables
-
-All metrics are served from pre-aggregated PostgreSQL tables, ensuring dashboard queries complete in under 100 milliseconds regardless of total event volume.
-
-#### Dashboard Preview
+A React dashboard built with TanStack Query and ApexCharts that shows request volume, error rates, p50/p95/p99 latency, top endpoints by traffic, and service health — all served from pre-aggregated tables.
 
 ![Sendry Dashboard](/project/sendry/dashboard.png)
 
----
+### Multi-Tenant Support
 
-## Engineering Challenges and Solutions
+Each organization gets isolated API keys, separate metric aggregations, and namespaced data. The architecture is billing-ready with per-customer event counting built in.
 
-### Challenge: Reliable Event Processing Under Network Failures
+## Technical Challenges
 
-Problem: Network partitions, server crashes, and transient failures can cause event loss if not handled carefully. The system must provide guarantees that telemetry is never discarded.
+### Making failure invisible to users
 
-Solution:
-- Implemented durable RabbitMQ queues with persistent storage to disk
-- Consumer uses manual acknowledgments instead of auto-acknowledgment
-- Events remain in queue until explicitly acknowledged after successful database writes
-- Graceful shutdown procedures allow in-flight operations to complete before termination
-- Dead-letter queues capture unprocessable messages for manual investigation
+The hardest constraint was that a monitoring system should never affect the system it monitors. If Sendry's queue goes down, the monitored application should keep running normally.
 
-Result: Even if consumer workers crash mid-processing, events are not lost and will be reprocessed after recovery.
+The circuit breaker solved this: when the queue is unhealthy, the ingestion layer fails fast with a 503 instead of blocking the caller. From the application's perspective, sending telemetry is a fire-and-forget operation.
 
----
+### Handling duplicates without database overhead
 
-### Challenge: Absorbing Traffic Spikes Without Backpressure
+Message brokers retry on failure, which can deliver the same event more than once. Writing a deduplication check to the database on every event would undo the performance gains of async processing.
 
-Problem: If a production application sends 10,000 requests per second during a traffic spike, the monitoring system must not block or slow down the application waiting for these requests to be processed.
+The solution was an in-memory Set capped at 100,000 entries using an LRU eviction strategy. Deduplication happens in memory with no database round-trip, keeping throughput high.
 
-Solution:
-- Implemented RabbitMQ as a durable buffer between ingestion and processing
-- Ingestion API publishes to queue and returns immediately (202 Accepted)
-- Consumer pulls from queue at its own pace, independent of ingestion rate
-- Horizontal scaling: additional consumer processes can be spawned to drain queue faster
-- Prefetch controls prevent any single worker from being overwhelmed
+### Keeping dashboard queries fast at scale
 
-Result: Traffic spikes are absorbed by the queue without propagating backpressure to production systems.
+Scanning raw events for every dashboard request gets expensive fast. The consumer aggregates events into hourly PostgreSQL buckets during processing — not at query time. Dashboard queries never touch raw event tables, so they stay fast regardless of how many total events exist.
 
----
+### Cross-domain cookies in development
 
-### Challenge: Handling Duplicate Message Delivery
+When the frontend and API run on different ports locally, browsers block session cookies due to SameSite policies. This was solved with environment-aware cookie configuration: `SameSite=Lax` in development, `SameSite=None; Secure` in production — switching automatically based on `NODE_ENV`.
 
-Problem: Message broker retry mechanisms can deliver the same message multiple times, causing duplicate entries in analytics. This corrupts metrics accuracy.
+## Key Results
 
-Solution:
-- Every event receives a unique hash identifier
-- Consumer maintains an in-memory Set of processed event IDs
-- Before writing to databases, consumer checks Set for duplicates
-- Set is capped at 100,000 entries to prevent memory leaks
-- Capped LRU structure discards oldest entries when size limit is reached
+- Sub-2ms telemetry ingestion, zero impact on monitored application latency
+- 10,000+ events per second on commodity hardware
+- Dashboard queries complete in 50–100ms at any event volume
+- Graceful degradation — monitoring failures never reach production users
+- Self-hosted, with no per-event SaaS pricing
 
-Result: Duplicate messages are transparently filtered with zero additional database overhead.
+## What I Learned
 
----
+Building Sendry forced me to think carefully about system boundaries and failure modes in a way that most web projects don't require.
 
-### Challenge: Efficient Analytics on Massive Event Volumes
+The most important lesson: decoupling is not just about scalability. It's about resilience. When each layer fails independently and predictably, the whole system becomes much easier to debug, operate, and extend.
 
-Problem: Scanning billions of raw events for every dashboard query is prohibitively expensive. Real-time dashboards would timeout regularly.
-
-Solution:
-- Implemented incremental aggregation during event processing
-- Consumer groups raw events into hourly buckets (service, endpoint, method, status code)
-- PostgreSQL UPSERT operations atomically merge into hourly metrics table
-- Dashboard queries scan pre-aggregated metrics tables instead of raw events
-- Storage size reduced by 98% through aggregation
-
-Result: Dashboard queries complete in 50-100ms regardless of total event volume.
-
----
-
-### Challenge: Cross-Domain Session Management in Development
-
-Problem: When testing locally (frontend on localhost:5173, API on localhost:5000), browsers block session cookies due to SameSite security policies. Testing required complex workarounds.
-
-Solution:
-- Implemented environment-aware cookie negotiation in authentication middleware
-- Development environment: SameSite=Lax, Secure=false
-- Production environment: SameSite=None, Secure=true
-- Automatic detection based on NODE_ENV
-
-Result: Development and production environments work seamlessly without manual configuration changes.
-
----
-
-## Production-Grade System Design
-
-The platform implements several critical patterns required for reliable, scalable systems:
-
-### Security & Access Control
-
-- JWT-based authentication with HTTP-only secure cookies
-- API Key management with per-client credential rotation
-- Role-based access control (RBAC) with admin, operator, and viewer roles
-- API key validation on every incoming telemetry request
-- Automatic token expiration and refresh mechanisms
-
-### Reliability Patterns
-
-- Circuit breaker pattern with three states (closed, open, half-open)
-- Exponential backoff with randomized jitter for retry handling
-- Dead-letter queues for handling unprocessable events
-- Health checks on all critical services
-- Graceful shutdown procedures with in-flight operation completion
-
-### Observability
-
-- Structured logging in JSON format for easy parsing
-- Request tracing with unique IDs for debugging
-- Performance metrics collection on all critical paths
-- Error aggregation and alerting
-
-### Infrastructure
-
-- Containerized deployments using Docker
-- Docker Compose for local development environment
-- Support for horizontal scaling (multiple consumer workers)
-- Connection pooling for database and message broker
-- Automated database migrations
-
-### Multi-Tenant Architecture
-
-- Namespace isolation between customers
-- Per-customer API keys and rate limiting
-- Separate metric aggregations by customer
-- Billing-ready event counting infrastructure
-
----
-
-## Technology Stack & Architecture
-
-### Frontend Layer
-
-- React 18 with Vite for optimized bundling
-- TanStack Query for server state management
-- ApexCharts for real-time metric visualization
-- Tailwind CSS for responsive design
-- Axios for REST API communication
-
-### Backend Services
-
-- Node.js runtime for high concurrency
-- Express.js framework for HTTP routing
-- JWT middleware for authentication
-- Structured logging middleware
-
-### Message Queue & Streaming
-
-- RabbitMQ 3.x for durable event queuing
-- Manual acknowledgments for delivery guarantees
-- Dead-letter exchanges for failure handling
-- Topic-based routing for multi-tenant isolation
-
-### Data Storage
-
-- MongoDB 6.0 for schemaless event storage
-- TTL indexes for automatic data expiration
-- PostgreSQL 15 for time-series aggregations
-- Connection pooling and query optimization
-
-### Deployment & Operations
-
-- Docker containerization for reproducible deployments
-- Docker Compose for local development
-- Environment-based configuration management
-- Graceful shutdown handling
-
-### Development Tools
-
-- ESLint for code quality
-- Jest for unit testing
-- Postman collections for API testing
-- Docker for isolated local environment
-
----
-
-## Key Architectural Insights
-
-Building Sendry provided deep experience with production system design patterns. The project demonstrated how architectural decisions made early in development have enormous downstream consequences.
-
-### Decoupled Architecture Enables Scalability
-
-The fundamental insight was separating concerns into independent layers. By keeping database writes out of the request path through message queueing, the system became horizontally scalable without architectural changes. Additional consumer processes can be spawned to increase throughput without modifying the ingestion layer.
-
-### Traffic Spike Absorption
-
-Message brokers exist primarily to absorb traffic variance. During peak loads, the queue buffers events naturally, preventing cascading failures. Bottlenecks appear gracefully as queue depth increases rather than as application errors. This provides visibility into when capacity should be expanded.
-
-### Idempotency Eliminates Whole Classes of Bugs
-
-By designing all operations to be idempotent, the system became dramatically more resilient. Events can be replayed, retried, or reprocessed without corrupting state. This single design decision eliminated entire categories of subtle concurrency bugs.
-
-### Event-Driven Architecture Requires Careful State Management
-
-The tradeoff for decoupling is increased complexity in state management. Monitoring the health of each layer independently became critical. Dead-letter queues surfaced issues that synchronous systems would expose immediately through exceptions.
-
-### Observability Must Be Built In
-
-Building a monitoring system while lacking built-in monitoring capabilities was challenging. The project benefited enormously from structured logging, unique request IDs, and per-component health checks. These weren't afterthoughts but architectural requirements.
-
-### Database Trade-offs
-
-The dual-database approach involved accepting higher operational complexity for significant performance gains. MongoDB handled write throughput that PostgreSQL alone would have struggled with. The trade-off was justified by the scale (billions of events) and access patterns (write-heavy raw events, read-heavy aggregations).
-
-### Circuit Breakers Prevent Chaos
-
-Without circuit breakers, infrastructure failures propagate as cascading errors. With them, failures are contained and visible. The three-state pattern is remarkably elegant for handling transient failures differently from persistent outages.
-
----
-
-## Impact and Outcomes
-
-The platform demonstrates how careful architectural design can solve operational problems that most teams try to solve with money (expensive SaaS platforms) or complexity (heavyweight open-source solutions).
-
-Key achievements:
-
-- Zero latency impact on monitored applications
-- Handles 10,000+ events per second with commodity hardware
-- Processes events with sub-2ms ingestion latency
-- Scales horizontally by adding consumer workers
-- Gracefully degrades under failure
-- Provides real-time operational visibility
-- Self-hosted, reducing long-term costs
-
-The project reinforced a core engineering principle: reliability is not a feature added after launch, but a property built into the architecture from day one.
+The dual-database architecture showed me that picking the right tool for each access pattern — rather than forcing one database to do everything — has a real, measurable impact on performance. And circuit breakers taught me that explicit failure handling is always better than letting failures propagate silently through a system.
