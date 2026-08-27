@@ -37,7 +37,7 @@ import Prisma from '@/components/technologies/Prisma';
 import ReactIcon from '@/components/technologies/ReactIcon';
 // Technology Components
 import TypeScript from '@/components/technologies/TypeScript';
-
+import AWS from '@/components/technologies/AWS';
 // Component mapping for skills
 export const skillComponents = {
   TypeScript: TypeScript,
@@ -48,13 +48,14 @@ export const skillComponents = {
   NodeJs: NodeJs,
   MongoDB: MongoDB,
   Prisma: Prisma,
+  AWS: AWS,
   JavaScript: JavaScript,
 };
 
 export const heroConfig = {
   // Personal Information
-  name: 'Sultan',
-  title: 'A Full Stack Engineer ',
+  name: 'Sultan Alam',
+  title: 'Full Stack & AI Engineer',
   avatar: '/assets/logo.jpg',
 
   // Skills Configuration
@@ -75,9 +76,9 @@ export const heroConfig = {
       component: 'NextJs',
     },
     {
-      name: 'Bun',
-      href: 'https://bun.sh/',
-      component: 'Bun',
+      name: 'AWS',
+      href: 'https://aws.amazon.com/',
+      component: 'AWS',
     },
     {
       name: 'PostgreSQL',

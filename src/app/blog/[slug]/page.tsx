@@ -1,3 +1,5 @@
+import ArticleJsonLd from '@/components/seo/ArticleJsonLd';
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import { BlogContent } from '@/components/blog/BlogContent';
 import { BlogList } from '@/components/blog/BlogList';
 import Container from '@/components/common/Container';
@@ -34,7 +36,6 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
-  //  await params
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
 
@@ -44,25 +45,51 @@ export async function generateMetadata({
     };
   }
 
-  const { title, description, image } = post.frontmatter;
+  const { title, description, image, tags = [], date } = post.frontmatter;
+  const canonicalUrl = `${siteConfig.url}/blog/${slug}`;
+  const imageUrl = image.startsWith('http') ? image : `${siteConfig.url}${image}`;
 
   return {
     metadataBase: new URL(siteConfig.url),
-    title,
+    title: `${title} — ${siteConfig.author.name}`,
     description,
+    keywords: [...tags, 'Sultan Alam', 'sultanxdev', 'web development', 'engineering'].join(', '),
+    authors: [{ name: siteConfig.author.name, url: siteConfig.url }],
+    creator: siteConfig.author.name,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
-      title,
+      title: `${title} — ${siteConfig.author.name}`,
       description,
-      images: [image],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
       type: 'article',
+      url: canonicalUrl,
+      siteName: siteConfig.title,
+      locale: 'en_US',
+      publishedTime: date,
+      modifiedTime: date,
+      authors: [siteConfig.author.name],
+      tags,
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: `${title} — ${siteConfig.author.name}`,
       description,
       site: siteConfig.author.twitter,
       creator: siteConfig.author.twitter,
-      images: [image],
+      images: [imageUrl],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }
@@ -78,6 +105,23 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <>
+      {/* Structured Data */}
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Blog', href: '/blog' },
+          { name: post.frontmatter.title, href: `/blog/${slug}` },
+        ]}
+      />
+      <ArticleJsonLd
+        title={post.frontmatter.title}
+        description={post.frontmatter.description}
+        slug={slug}
+        image={post.frontmatter.image}
+        publishedDate={post.frontmatter.date}
+        tags={post.frontmatter.tags}
+      />
+
       <Container className="py-16">
         <div className="space-y-12">
           {/* Back Button */}

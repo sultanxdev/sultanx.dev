@@ -1,3 +1,4 @@
+import BreadcrumbJsonLd from '@/components/seo/BreadcrumbJsonLd';
 import Container from '@/components/common/Container';
 import { ProjectContent } from '@/components/projects/ProjectContent';
 import { ProjectNavigation } from '@/components/projects/ProjectNavigation';
@@ -43,25 +44,54 @@ export async function generateMetadata({
     };
   }
 
-  const { title, description, image } = caseStudy.frontmatter;
+  const { title, description, image, technologies = [] } = caseStudy.frontmatter;
+  const canonicalUrl = `${siteConfig.url}/projects/${slug}`;
+  const imageUrl = image.startsWith('http') ? image : `${siteConfig.url}${image}`;
 
   return {
     metadataBase: new URL(siteConfig.url),
-    title: `${title} - Project Case Study`,
+    title: `${title} — Project by ${siteConfig.author.name}`,
     description,
+    keywords: [
+      title,
+      'Sultan Alam',
+      'sultanxdev',
+      'full stack project',
+      'case study',
+      ...technologies,
+    ].join(', '),
+    authors: [{ name: siteConfig.author.name, url: siteConfig.url }],
+    creator: siteConfig.author.name,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
-      title: `${title} - Project Case Study`,
+      title: `${title} — Project by ${siteConfig.author.name}`,
       description,
-      images: [image],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
       type: 'article',
+      url: canonicalUrl,
+      siteName: siteConfig.title,
+      locale: 'en_US',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} - Project Case Study`,
+      title: `${title} — Project by ${siteConfig.author.name}`,
       description,
       site: siteConfig.author.twitter,
       creator: siteConfig.author.twitter,
-      images: [image],
+      images: [imageUrl],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }
@@ -81,6 +111,15 @@ export default async function ProjectCaseStudyPage({
 
   return (
     <Container className="py-16">
+      {/* Structured Data */}
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Projects', href: '/projects' },
+          { name: caseStudy.frontmatter.title, href: `/projects/${slug}` },
+        ]}
+      />
+
       <div className="space-y-12">
         {/* Back Button */}
         <div>
