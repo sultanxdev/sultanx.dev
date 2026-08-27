@@ -1,3 +1,4 @@
+import GoogleAnalytics from '@/components/analytics/GoogleAnalytics';
 import UmamiAnalytics from '@/components/analytics/UmamiAnalytics';
 import Footer from '@/components/common/Footer';
 import Navbar from '@/components/common/Navbar';
@@ -34,6 +35,7 @@ export default function RootLayout({
               <OnekoCat />
               <Footer />
               <UmamiAnalytics />
+              <GoogleAnalytics />
             </ReactLenis>
           </ThemeProvider>
         </body>
