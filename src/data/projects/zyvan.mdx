@@ -27,162 +27,45 @@ featured: true
 isPublished: true
 ---
 
+> **Active Development** — Zyvan is currently being built. This page documents the architecture, decisions, and progress as the project evolves.
+
 ## Overview
 
 Zyvan is an India-first infrastructure platform for reliable webhook and event delivery.
 
-I'm building Zyvan to handle the parts of webhook systems that become difficult in production — durable event storage, asynchronous processing, retries, idempotency, failure recovery, and observability.
+Every modern SaaS product sends webhooks — payment confirmations, order updates, user events, system notifications. When those webhooks work, nobody thinks about them. When they fail silently, teams scramble to figure out what happened, replay events manually, and explain to customers why their integration broke.
 
-Instead of every engineering team building their own queue workers, retry logic, dead-letter handling, and delivery monitoring, Zyvan provides that reliability layer as a developer-focused platform.
+The problem isn't sending the webhook. It's everything that happens when the destination isn't ready: the 500 errors, the timeouts, the retries, the duplicate deliveries, the events lost forever because nothing caught them. Every engineering team that ships a webhook system eventually builds their own retry logic, dead-letter handling, and delivery monitoring — and they build it in a hurry, usually after something breaks in production.
+
+Zyvan is the infrastructure layer that handles all of that reliably, exposed as a developer-facing platform so teams don't have to rebuild it themselves.
 
 ## The Problem
 
-Webhooks are easy when everything works.
+Webhooks look simple until they fail.
 
-The problems start when a destination returns `500`, a request times out, an event is delivered twice, or a customer's service goes offline for hours.
+A destination goes down for 20 minutes. Does your system retry? How many times? With what backoff? If it retries too aggressively, you hammer a recovering service. If it doesn't retry at all, events are lost. If it retries without idempotency controls, you deliver the same event multiple times and corrupt data on the receiving end.
 
-At that point, developers need to answer questions like:
+Most teams handle this by bolting retry logic onto their existing queue system — usually as an afterthought, usually incomplete. The result is a system that works fine in development and breaks quietly in production.
 
-- Was the event received?
-- Was it stored safely?
-- Was delivery attempted?
-- How many times was it retried?
-- Why did it fail?
-- Can it be replayed?
-- Could another tenant's traffic affect this delivery?
+What a proper webhook delivery system actually needs:
 
-Building all of this internally quickly turns a simple webhook endpoint into a distributed system.
+- **Durable ingestion** — events persisted before anything else happens, so nothing is lost on crash
+- **Idempotency** — safe to retry without causing duplicate side effects on the destination
+- **Intelligent retries** — exponential backoff and jitter so retries don't compound an outage
+- **Dead-letter handling** — failed events isolated for inspection and replay, not just silently dropped
+- **Event replay** — recover from downstream failures by replaying events after fixing the destination
+- **Multi-tenant isolation** — one customer's volume can't starve another's delivery queue
+- **Delivery observability** — know exactly what was sent, when, what it got back, and why it failed
 
-I wanted to build the infrastructure layer that handles those failure cases for the developer.
+Building all of this correctly takes serious engineering effort. Zyvan builds it once, as a platform.
 
-## The Solution
+## What I'm Building
 
-Zyvan sits between an application and its webhook destinations.
-
-A developer sends an event to Zyvan, and the platform takes care of storing, queueing, delivering, retrying, and tracking the event.
-
-The basic workflow is:
+Zyvan sits between an application and its webhook destinations. A developer sends an event to Zyvan; the platform takes responsibility for storing, queueing, delivering, retrying, and tracking it.
 
 **Send Event → Persist → Queue → Deliver → Retry if needed → Recover / Replay**
 
-The goal is to make reliable event delivery available through a simple developer-facing API instead of requiring teams to maintain their own reliability infrastructure.
-
-## Architecture
-
-The system is built around a durable event pipeline that separates ingestion from delivery processing.
-
-The API accepts and persists events first, while background workers handle delivery asynchronously.
-
-PostgreSQL acts as the durable source of truth, while Redis and BullMQ are used for asynchronous processing and delivery orchestration.
-
-The architecture is intentionally modular so individual components can evolve independently as usage grows.
-
-## What I Built
-
-### Durable Event Ingestion
-
-Events are persisted before delivery processing so the system has a durable record of the event lifecycle.
-
-### Asynchronous Delivery
-
-Webhook delivery runs through background workers instead of blocking the API request path.
-
-### Idempotency
-
-Duplicate events are handled using idempotency controls so retries or repeated deliveries don't unnecessarily create duplicate processing.
-
-### Retry Engine
-
-Failed deliveries can be retried using configurable retry behavior with exponential backoff and jitter.
-
-### Dead-Letter Recovery
-
-Events that repeatedly fail are separated from normal processing so they can be inspected and recovered without blocking other events.
-
-### Event Replay
-
-Failed or previously delivered events can be replayed when developers need to recover from downstream failures.
-
-### HMAC Signing
-
-Outbound webhook requests can be signed so receiving applications can verify that requests originated from Zyvan.
-
-### Delivery History
-
-Each event can track delivery status, attempts, response information, and timing for debugging.
-
-### Multi-Tenant Architecture
-
-The platform is designed around organization-level isolation so multiple customers can use the same infrastructure safely.
-
-## Technical Challenges
-
-### Reliable Delivery
-
-The hardest part of webhook infrastructure isn't sending an HTTP request.
-
-It's handling everything that happens when the request fails.
-
-Zyvan treats transient failures, timeouts, duplicate events, and unavailable destinations as expected system conditions rather than exceptional cases.
-
-### Idempotency
-
-Webhook systems operate with at-least-once delivery semantics, which means duplicate events can happen.
-
-The challenge is preventing those duplicates from turning into duplicate side effects.
-
-This led to idempotency being treated as a core part of the delivery design rather than an optional feature.
-
-### Retry Behaviour
-
-Naive retries can make an outage worse.
-
-If thousands of failed events are retried at the same time, the destination can become even more overloaded.
-
-Zyvan uses exponential backoff and jitter to spread retry attempts and reduce retry spikes.
-
-### Queue Backpressure
-
-A destination can process events much slower than they arrive.
-
-The queue provides a buffer between incoming traffic and downstream delivery so temporary differences in processing speed don't immediately propagate back to the application.
-
-This also creates a place to apply rate and concurrency controls.
-
-### Multi-Tenant Isolation
-
-Infrastructure serving multiple customers needs to prevent a high-volume tenant from consuming all available processing capacity.
-
-The architecture therefore considers tenant-level limits and isolation as part of the reliability model.
-
-### Failure Recovery
-
-A failure should not become a permanently lost event.
-
-Events that cannot be delivered normally can move into a recovery path where developers can inspect the failure and replay the event after fixing the destination.
-
-## India-First
-
-Zyvan is being built India-first for developers and SaaS teams operating in the Indian ecosystem.
-
-The initial focus includes:
-
-- INR-friendly pricing
-- India-region infrastructure
-- Indian SaaS companies
-- Fintech and payment integrations
-- Shopify and e-commerce applications
-- Developer-focused infrastructure for growing Indian startups
-
-The goal is to start with the Indian developer ecosystem while keeping the platform usable for global customers.
-
-## Developer Experience
-
-The intended integration is simple:
-
-**Create Project → Create API Key → Configure Destination → Send Event → Monitor Delivery**
-
-Example:
+From the application's perspective, it's a single HTTP call:
 
 ```ts
 const response = await fetch("https://ingest.zyvan.dev/v1/events", {
@@ -193,112 +76,61 @@ const response = await fetch("https://ingest.zyvan.dev/v1/events", {
   },
   body: JSON.stringify({
     type: "invoice.paid",
-    data: {
-      invoiceId: "inv_123",
-    },
+    data: { invoiceId: "inv_123" },
   }),
 });
 ```
 
-The idea is that developers should not need to manage the queue workers, retry scheduler, dead-letter flow, or delivery state themselves.
+From there, Zyvan handles everything. The destination receives the webhook, signed with HMAC so it can verify authenticity. If delivery fails, the system retries with exponential backoff. If it keeps failing, the event moves to a dead-letter queue where the developer can inspect it and replay it once the destination is healthy.
 
-## Technical Highlights
+Every delivery attempt is recorded — status code, response body, latency, timestamp. There's no guessing about what happened.
 
-- Durable event persistence
-- Asynchronous webhook delivery
-- Retry orchestration
-- Idempotency
-- Dead-letter recovery
-- Event replay
-- HMAC signing
-- Delivery attempt tracking
-- Multi-tenant architecture
-- Rate limiting and backpressure
-- API-first design
-- Structured observability
+## Architecture
 
-## Technology Stack
+The system is built around a durable event pipeline that decouples ingestion from delivery processing.
 
-### Frontend
+The ingestion API accepts an event, validates the API key, persists the event to PostgreSQL, and enqueues it for delivery — all before returning to the caller. The caller gets a confirmation immediately; delivery happens in the background.
 
-Next.js · React · TypeScript · Tailwind CSS · Shadcn UI
+PostgreSQL is the source of truth. Redis and BullMQ handle the async delivery queue and retry scheduling. This separation means the system can absorb traffic spikes without losing events — if the queue backs up, events wait in durable storage rather than being dropped.
 
-### Backend
+The architecture is deliberately modular so individual components can be improved independently. The delivery worker, retry engine, and dead-letter handler are all separate concerns.
 
-Node.js · Fastify · REST APIs · Prisma
+## Key Engineering Decisions
 
-### Data & Processing
+**Persist before queuing.** The event is written to the database before it enters the queue. If the worker crashes mid-processing, the event is still recoverable. No events are lost to infrastructure failures.
 
-PostgreSQL · Redis · BullMQ
+**Idempotency as a core constraint, not a feature.** Queues guarantee at-least-once delivery, which means duplicates happen. The system uses idempotency keys to detect and suppress duplicate deliveries, so retries are always safe on the destination side.
 
-### Infrastructure
+**Backoff with jitter.** Naive exponential backoff causes retry storms when multiple events fail simultaneously. Adding randomized jitter spreads the retry load and prevents a recovering destination from being immediately re-hammered.
 
-Docker
+**Tenant-level isolation in the queue.** A high-volume tenant sending 100,000 events shouldn't delay a smaller tenant's delivery. Queue priority and rate limits are modeled at the tenant level from the beginning.
 
-## Reliability Model
+**HMAC signing on every outbound request.** Destinations can verify that requests genuinely came from Zyvan, not a third party. Security is a first-class concern, not an optional add-on.
 
-Zyvan is designed around the idea that failures are normal in distributed systems.
+## Why India-First
 
-A webhook destination might:
+The webhook infrastructure market has strong global players — Svix, Hookdeck, Convoy. But none of them are built with the Indian market as a primary concern.
 
-- Return `500`
-- Timeout
-- Temporarily go offline
-- Recover later
-- Receive duplicate events
+Indian SaaS companies, fintech platforms, e-commerce integrations, and payment providers have specific needs: INR pricing that makes sense at Indian market rates, India-region infrastructure for compliance and latency, and integration patterns that match Indian payment and commerce ecosystems (Razorpay, Shiprocket, Shopify India, and similar).
 
-Instead of treating these situations as lost events, the delivery pipeline keeps the event state visible and moves it through the appropriate retry or recovery path.
-
-This makes the system easier to operate and debug.
+Zyvan starts with the Indian developer ecosystem as its primary audience. The pricing, infrastructure, and integration roadmap are all designed around Indian market realities — with the architecture fully capable of serving global customers as the platform grows.
 
 ## Current Status
 
-Zyvan is currently in active development.
-
-The first version focuses on getting the core reliability path right:
+The first version is focused entirely on getting the core reliability path right:
 
 **Receive → Persist → Queue → Deliver → Retry → Recover → Replay**
 
-The next stage is focused on stronger observability, tenant-level controls, production hardening, and developer experience.
+That complete loop — working correctly, reliably, at production quality — is the foundation everything else builds on. Once it's solid, the next stage covers stronger observability, tenant-level controls, advanced rate limiting, and deeper developer tooling.
 
-## What I Learned
+Building in public. Shipping toward something real.
 
-Building Zyvan has pushed me deeper into distributed systems and backend reliability.
+## What This Project Demonstrates
 
-The biggest areas I've worked through are:
+For anyone reviewing this as part of hiring or due diligence:
 
-- Asynchronous processing
-- Queue architecture
-- Idempotency
-- Retry strategies
-- Dead-letter recovery
-- Multi-tenant system design
-- API design
-- Database modeling
-- Failure handling
-- Observability
+This project sits in the infrastructure layer of the stack — the kind of engineering that's invisible when it works and catastrophic when it doesn't. Building it well requires understanding distributed systems, failure modes, queue semantics, idempotency, and multi-tenant architecture at a level that most web projects don't demand.
 
-The biggest lesson has been that reliable infrastructure is less about the happy path and more about designing what happens when everything goes wrong.
+Zyvan is unfinished. That's expected — it's being actively built right now. What the project demonstrates isn't completion; it's the ability to identify a real problem in a real market, design a production-quality system to solve it, and execute on that design independently from architecture through implementation.
 
-## Future Direction
-
-The long-term direction is to make Zyvan a developer infrastructure platform for reliable events and webhooks.
-
-Planned areas include:
-
-- Advanced tenant isolation
-- Adaptive retry policies
-- Better rate limiting and backpressure
-- Deeper event observability
-- Additional integrations
-- Improved replay and debugging
-- Managed cloud infrastructure
-- More developer tooling
-
-## Key Takeaway
-
-Zyvan is an exploration of how to turn webhook delivery from application-specific code into a reusable reliability layer.
-
-The project focuses on a simple idea:
-
-Developers should be able to send an event without having to build the entire reliability system around it.
+The decisions being made here — how events are persisted, how retries are scheduled, how tenants are isolated, how failures are surfaced — reflect genuine systems thinking, not just following a tutorial.

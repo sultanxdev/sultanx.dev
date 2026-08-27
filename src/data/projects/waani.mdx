@@ -28,160 +28,57 @@ featured: true
 isPublished: true
 ---
 
+> **Active Development** — Waani is currently being built. This page documents the architecture, decisions, and progress as the project evolves.
+
 ## Overview
 
-Waani is an India-first developer platform for building AI-powered phone agents.
+Waani is an India-first developer platform for building production-ready AI phone agents.
 
-I'm building Waani to simplify the infrastructure behind voice AI applications. Instead of integrating telephony, realtime audio streaming, speech-to-text, LLMs, and text-to-speech separately, developers can build their voice agent around a single platform.
+The voice AI space is growing fast — but the infrastructure behind it is still painful to build. Every team that wants to ship a voice agent has to independently solve telephony, WebSocket audio streaming, speech-to-text, LLM orchestration, text-to-speech, conversation state, multi-tenancy, and provider reliability. That's a significant distributed systems problem before you've written a single line of actual product logic.
 
-The project focuses on the engineering problems that appear when voice AI moves beyond a demo — realtime communication, conversation state, provider failures, latency, authentication, and multi-tenant architecture.
+Waani's goal is to solve that infrastructure layer once — and expose it through a clean, developer-focused API. So a team building a support bot, a voice IVR, or a Hindi-language assistant can focus on the experience they're building, not the plumbing underneath it.
+
+I'm building this because I've worked through those infrastructure problems myself, and I believe there's a real gap in the Indian market specifically — where telephony, language, and cost constraints make generic global platforms a poor fit.
 
 ## The Problem
 
-Building an AI phone agent looks simple from the outside, but the underlying system involves several moving parts.
+Building a voice AI agent is genuinely hard the first time.
 
-A developer typically needs to connect:
+It looks approachable from the outside — connect a phone number, run some audio through an LLM, play back a response. But in practice, you're dealing with:
 
-- Telephony
-- WebSocket audio streaming
-- Speech-to-text
-- LLMs
-- Text-to-speech
-- Conversation state
-- Call lifecycle management
-- Authentication and APIs
+- Telephony providers with their own quirks and failure modes
+- WebSocket audio that needs to flow bidirectionally without buffering or gaps
+- STT that needs to produce clean transcripts fast enough for a conversation to feel natural
+- LLM responses that need to arrive before the caller gets impatient
+- TTS that needs to sound good enough not to break the experience
+- Conversation memory that persists across multiple turns
+- Provider failures that can silently kill a session mid-call
+- Multi-tenant isolation so one customer's calls don't affect another's
 
-The difficult part is making all of these components work together reliably while keeping the conversation responsive.
+Every one of these is a solvable problem. But solving all of them together, reliably, at scale, is a real engineering effort — one that most product teams shouldn't have to repeat from scratch.
 
-I wanted to build the infrastructure layer that handles this complexity so developers can focus on the actual voice experience and business logic.
+## What I'm Building
 
-## The Solution
+Waani is the infrastructure layer that handles all of this, exposed as a developer platform.
 
-Waani provides a unified developer-facing layer for building and operating AI voice agents.
+A team using Waani can:
 
-A developer can:
+1. Create an AI agent with instructions, language, and persona
+2. Connect an Indian phone number through Exotel
+3. Receive or initiate a call
+4. Have a real-time multi-turn AI conversation — STT → LLM → TTS, all coordinated
+5. Automatically save the transcript and call metadata
+6. Inspect everything through a dashboard or API
 
-1. Create an AI agent
-2. Configure its instructions and language
-3. Connect a phone number
-4. Receive or initiate a call
-5. Run a realtime AI conversation
-6. Store and inspect the conversation
-7. Manage everything through APIs and a dashboard
+The intended workflow from signup to first real call is:
 
-The goal is to make voice AI integration feel more like working with a developer platform than stitching together multiple infrastructure services.
-
-## Architecture
-
-The system is designed around a realtime voice runtime that coordinates the telephony connection, audio stream, STT, LLM, and TTS layers.
-
-The application is intentionally modular so each provider can be replaced independently without changing the core conversation logic.
-
-## What I Built
-
-### Voice Agent API
-
-Created APIs for managing agents, configurations, organizations, API keys, and calls.
-
-### Realtime Voice Runtime
-
-Built the realtime communication layer using WebSockets to handle bidirectional audio during active calls.
-
-### AI Pipeline
-
-Connected speech-to-text, LLM processing, and text-to-speech into a single conversational flow.
-
-### Conversation State
-
-Implemented multi-turn conversation handling so the agent can maintain context throughout a call.
-
-### Telephony Integration
-
-Integrated Exotel for Indian phone connectivity and call handling.
-
-### Call Management
-
-Added call lifecycle tracking, call history, transcripts, and call details.
-
-### Multi-Tenant Architecture
-
-Designed the application around tenant isolation so each organization's agents, calls, and data remain separated.
-
-### Provider Abstraction
-
-Separated external providers behind interfaces so STT, LLM, TTS, and telephony providers can be changed independently.
-
-## Technical Challenges
-
-### Realtime Latency
-
-Voice applications are much less forgiving of latency than normal web applications.
-
-A slow API response can be annoying. A slow voice response makes a conversation feel broken.
-
-Because of that, the system treats realtime communication and provider latency as first-class concerns.
-
-### Provider Failures
-
-The voice pipeline depends on multiple external services.
-
-A failure in STT, LLM, TTS, or telephony can interrupt the entire conversation.
-
-I added explicit timeout and failure handling so an external provider cannot keep a voice session waiting indefinitely.
-
-### Conversation State
-
-A voice agent needs to understand the current turn while also remembering previous turns.
-
-Waani keeps conversation state separate from the transport layer so the voice session can continue across multiple interactions.
-
-### Provider Dependency
-
-Using a single provider creates a strong dependency on that vendor.
-
-Waani therefore uses provider-neutral interfaces instead of coupling business logic directly to individual providers.
-
-This makes future provider changes and fallback strategies much easier to introduce.
-
-### Multi-Tenancy
-
-The platform is designed for multiple organizations using the same infrastructure.
-
-Tenant ownership is enforced at the backend and database layer rather than relying on frontend filtering.
-
-## India-First
-
-Waani is being built specifically with Indian voice applications in mind.
-
-The initial focus is on:
-
-- Indian telephony
-- Hindi voice experiences
-- Hinglish
-- Indian-language expansion
-- Realtime voice quality
-- Provider reliability
-- Cost-conscious infrastructure
-
-The goal is not simply to make a generic voice platform available in India.
-
-The longer-term goal is to understand and optimize the voice experience for Indian users.
-
-## Developer Experience
-
-The intended workflow is:
-
-**Sign up → Create Agent → Configure Agent → Connect Phone Number → Make a Call → Inspect Transcript**
-
-The API is the primary interface, while the dashboard provides configuration and operational visibility.
-
-Example:
+**Sign up → Create Agent → Configure Agent → Connect Number → Make a Call → Inspect Transcript**
 
 ```ts
 const agent = await waani.agents.create({
   name: "Support Agent",
   language: "hi-IN",
-  instructions: "You are a helpful support agent."
+  instructions: "You are a helpful support agent for Acme Corp."
 });
 
 const call = await waani.calls.create({
@@ -190,47 +87,51 @@ const call = await waani.calls.create({
 });
 ```
 
+The API is the primary interface. The dashboard handles configuration and gives operational visibility into calls, transcripts, and agent performance.
+
+## Architecture
+
+The system is built around a realtime voice runtime — the core engine that coordinates the telephony connection, audio stream, STT, LLM, and TTS layers for each active call.
+
+The architecture is deliberately modular. Each provider sits behind an interface, so STT, LLM, TTS, and telephony can be swapped or upgraded independently without touching the core conversation logic. That makes future provider changes, fallback strategies, and performance tuning much easier to introduce.
+
+Multi-tenancy is enforced at the data and API layer — not as a frontend concern. Each organization's agents, calls, transcripts, and keys are isolated from day one.
+
+## Key Engineering Decisions
+
+**WebSocket-first audio transport.** Real phone calls don't work with request/response. The voice runtime maintains a persistent WebSocket connection for the duration of each call, handling bidirectional audio in real time.
+
+**Provider abstraction from the start.** Indian voice AI has limited provider options compared to global markets. Locking business logic to a single STT or TTS provider early would make future improvements painful. Every external service sits behind an interface so the underlying provider can change without breaking the conversation pipeline.
+
+**Explicit timeout and failure handling.** If an external provider hangs, the call should recover — not wait indefinitely. Every step in the pipeline has explicit timeouts and failure paths so a single slow provider can't stall the entire session.
+
+**Tenant isolation enforced at the data layer.** Ownership is checked at the database and API level on every request. Frontend filtering is not a security boundary.
+
+## Why India-First
+
+Most voice AI platforms are built for English-speaking, US/EU markets. When you try to use them for Indian use cases, you run into gaps immediately:
+
+- Telephony integrations that don't support Indian carriers
+- STT models that handle Indian English or Hindi poorly
+- Latency characteristics that don't account for Indian network conditions
+- Pricing that doesn't make sense at Indian market rates
+
+Waani is being built with these constraints as first-class design requirements — not as afterthoughts. The initial focus is on Indian telephony (Exotel), Sarvam for Hindi/Indic language STT and TTS, Hinglish support, and cost-conscious infrastructure designed for Indian market economics.
+
 ## Current Status
 
-Waani is currently in active development.
+The first milestone is one complete, end-to-end workflow: create an agent → connect an Indian phone number → make a real call → have a multi-turn AI conversation → save the transcript → inspect the call in the dashboard.
 
-The first milestone is deliberately focused on one complete workflow:
+Once that loop works reliably, the next stage covers provider fallback, multilingual support, voice quality evaluation, model routing, and deeper observability.
 
-Create an agent → connect an Indian phone number → make a real call → have a multi-turn AI conversation → save the transcript → inspect the call in the dashboard.
+Building in public and shipping toward something real — not just a prototype.
 
-More advanced capabilities such as provider fallback, multilingual support, voice evaluation, model routing, and advanced observability will come after the core voice loop is reliable.
+## What This Project Demonstrates
 
-## What I Learned
+For anyone reviewing this as part of hiring or due diligence:
 
-Building Waani has pushed me deeper into areas that are difficult to experience through normal web applications:
+This project represents the kind of engineering problem I actively seek out — not a tutorial project or a CRUD application, but a genuine distributed systems challenge with real constraints around latency, reliability, and provider dependencies.
 
-- Realtime WebSocket systems
-- Telephony integration
-- Audio streaming
-- STT / LLM / TTS orchestration
-- Stateful AI conversations
-- Provider abstraction
-- Distributed failure handling
-- Latency-sensitive system design
-- Multi-tenant architecture
+It shows experience with realtime systems, WebSocket infrastructure, multi-tenant architecture, API design, provider abstraction patterns, and the ability to scope and execute a non-trivial solo product from architecture to working system.
 
-The biggest lesson has been that a voice AI product is not just an AI model wrapped in an API. The surrounding realtime infrastructure is equally important.
-
-## Future Direction
-
-The longer-term direction is to make Waani an India-first infrastructure layer for developers building production voice applications.
-
-Planned areas include:
-
-- Better realtime streaming
-- Provider fallback
-- Hindi and Hinglish optimization
-- Additional Indian languages
-- Voice-quality evaluation
-- Model and provider routing
-- Advanced debugging and observability
-- Developer tooling
-
-## Key Takeaway
-
-Waani is an exploration of what it takes to build the infrastructure behind realtime AI voice applications — from the phone call and audio stream to the AI response and developer-facing APIs.
+Waani is unfinished. That's the point — it's being built right now. The decisions being made here reflect how I actually think about systems, not just what I can ship in a weekend.
