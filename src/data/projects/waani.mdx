@@ -1,7 +1,7 @@
 ---
 title: 'Waani — India-First Voice AI Infrastructure'
 description: 'Developer-first infrastructure for building realtime AI phone agents with Indian telephony, WebSockets, STT, LLMs, and TTS.'
-image: '/project/waani/hero.png'
+image: '/project/waani/demo.png'
 technologies:
   [
     'Next.js',
@@ -26,12 +26,13 @@ team: 'Solo'
 status: 'in-progress'
 featured: true
 isPublished: true
+---
 
 ## Overview
 
 Waani is an India-first developer platform for building AI-powered phone agents.
 
-I’m building Waani to simplify the infrastructure behind voice AI applications. Instead of integrating telephony, realtime audio streaming, speech-to-text, LLMs, and text-to-speech separately, developers can build their voice agent around a single platform.
+I'm building Waani to simplify the infrastructure behind voice AI applications. Instead of integrating telephony, realtime audio streaming, speech-to-text, LLMs, and text-to-speech separately, developers can build their voice agent around a single platform.
 
 The project focuses on the engineering problems that appear when voice AI moves beyond a demo — realtime communication, conversation state, provider failures, latency, authentication, and multi-tenant architecture.
 
@@ -77,8 +78,6 @@ The goal is to make voice AI integration feel more like working with a developer
 ---
 
 ## Architecture
-
-**[Add architecture diagram here]**
 
 The system is designed around a realtime voice runtime that coordinates the telephony connection, audio stream, STT, LLM, and TTS layers.
 
@@ -211,7 +210,11 @@ const call = await waani.calls.create({
   agentId: agent.id,
   to: "+91XXXXXXXXXX"
 });
-Current Status
+```
+
+---
+
+## Current Status
 
 Waani is currently in active development.
 
@@ -221,37 +224,43 @@ Create an agent → connect an Indian phone number → make a real call → have
 
 More advanced capabilities such as provider fallback, multilingual support, voice evaluation, model routing, and advanced observability will come after the core voice loop is reliable.
 
-What I Learned
+---
+
+## What I Learned
 
 Building Waani has pushed me deeper into areas that are difficult to experience through normal web applications:
 
-Realtime WebSocket systems
-Telephony integration
-Audio streaming
-STT / LLM / TTS orchestration
-Stateful AI conversations
-Provider abstraction
-Distributed failure handling
-Latency-sensitive system design
-Multi-tenant architecture
+- Realtime WebSocket systems
+- Telephony integration
+- Audio streaming
+- STT / LLM / TTS orchestration
+- Stateful AI conversations
+- Provider abstraction
+- Distributed failure handling
+- Latency-sensitive system design
+- Multi-tenant architecture
 
 The biggest lesson has been that a voice AI product is not just an AI model wrapped in an API. The surrounding realtime infrastructure is equally important.
 
-Future Direction
+---
+
+## Future Direction
 
 The longer-term direction is to make Waani an India-first infrastructure layer for developers building production voice applications.
 
 Planned areas include:
 
-Better realtime streaming
-Provider fallback
-Hindi and Hinglish optimization
-Additional Indian languages
-Voice-quality evaluation
-Model and provider routing
-Advanced debugging and observability
-Developer tooling
-Key Takeaway
+- Better realtime streaming
+- Provider fallback
+- Hindi and Hinglish optimization
+- Additional Indian languages
+- Voice-quality evaluation
+- Model and provider routing
+- Advanced debugging and observability
+- Developer tooling
+
+---
+
+## Key Takeaway
 
 Waani is an exploration of what it takes to build the infrastructure behind realtime AI voice applications — from the phone call and audio stream to the AI response and developer-facing APIs.
----

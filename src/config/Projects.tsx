@@ -82,7 +82,7 @@ export const projects: Project[] = [
     title: 'Waani',
     description:
       'India-first voice AI infrastructure for developers, combining telephony, realtime audio streaming, speech-to-text, LLM orchestration, text-to-speech, conversation state, and provider abstraction for production voice agents.',
-    image: '/project/waani/hero.png',
+    image: '/project/waani/demo.png',
     link: '#',
     technologies: [
       { name: 'TypeScript', icon: <TypeScript key="waani-typescript" /> },
@@ -97,8 +97,8 @@ export const projects: Project[] = [
       { name: 'Tailwind CSS', icon: <TailwindCss key="waani-tailwind" /> },
       { name: 'Shadcn UI', icon: <Shadcn key="waani-shadcn" /> },
     ],
-    github: '',
-    live: '',
+    github: 'https://github.com/sultanxdev/waani',
+    live: 'https://github.com/sultanxdev/waani',
     details: true,
     projectDetailsPageSlug: '/projects/waani',
     isWorking: false, // that means this in development phase..
@@ -109,7 +109,7 @@ export const projects: Project[] = [
     title: 'Zyvan',
     description:
       'Production-grade webhook delivery infrastructure built on durable acknowledgment principles with idempotent ingestion, exponential retries, DLQ handling, and SSRF-safe outbound proxy architecture.',
-    image: '/project/demo.png',
+    image: '/project/zyvan/demo.png',
     link: 'https://www.zyvan.in',
     technologies: [
       { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
