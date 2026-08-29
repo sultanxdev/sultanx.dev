@@ -6,9 +6,11 @@ import { motion } from "motion/react";
 export function TextHoverEffect({
     text,
     duration = 0,
+    className = "",
 }: {
     text: string;
     duration?: number;
+    className?: string;
 }) {
     const svgRef = useRef<SVGSVGElement>(null);
     const [cursor, setCursor] = useState({ x: 0, y: 0 });
@@ -32,30 +34,30 @@ export function TextHoverEffect({
             ref={svgRef}
             width="100%"
             height="100%"
-            viewBox="0 0 300 100"
+            viewBox="0 0 300 68"
             xmlns="http://www.w3.org/2000/svg"
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             onMouseMove={(e) => setCursor({ x: e.clientX, y: e.clientY })}
-            className="select-none"
+            className={`block w-full select-none ${className}`}
         >
             <defs>
                 {/* Vibrant gradient for hover reveal */}
                 <linearGradient id="textFillGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#8b5cf6" />
-                    <stop offset="25%" stopColor="#d946ef" />
-                    <stop offset="50%" stopColor="#f43f5e" />
-                    <stop offset="75%" stopColor="#f97316" />
-                    <stop offset="100%" stopColor="#eab308" />
+                    <stop offset="0%" stopColor="##40db32ff" />
+                    <stop offset="25%" stopColor="#40db32ff" />
+                    <stop offset="50%" stopColor="#40db32ff" />
+                    <stop offset="75%" stopColor="#40db32ff" />
+                    <stop offset="100%" stopColor="#40db32ff" />
                 </linearGradient>
 
                 {/* Stroke gradient for hover reveal outline */}
                 <linearGradient id="textStrokeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="25%" stopColor="#a855f7" />
-                    <stop offset="50%" stopColor="#ec4899" />
-                    <stop offset="75%" stopColor="#eab308" />
-                    <stop offset="100%" stopColor="#6366f1" />
+                    <stop offset="0%" stopColor="#40db32ff" />
+                    <stop offset="25%" stopColor="#40db32ff" />
+                    <stop offset="50%" stopColor="#40db32ff" />
+                    <stop offset="75%" stopColor="#40db32ff" />
+                    <stop offset="100%" stopColor="#40db32ff" />
                 </linearGradient>
 
                 {/* Radial gradient mask that follows cursor */}
@@ -94,12 +96,13 @@ export function TextHoverEffect({
                 x="50%"
                 y="50%"
                 textAnchor="middle"
-                dominantBaseline="middle"
+                dominantBaseline="central"
                 className="fill-[#e8e8e8] dark:fill-[#1a1a1a]"
                 style={{
                     fontSize: "72px",
                     fontFamily: "system-ui, -apple-system, sans-serif",
                     fontWeight: 900,
+                    letterSpacing: "-0.01em",
                 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -113,7 +116,7 @@ export function TextHoverEffect({
                 x="50%"
                 y="50%"
                 textAnchor="middle"
-                dominantBaseline="middle"
+                dominantBaseline="central"
                 stroke="url(#textStrokeGradient)"
                 strokeWidth="0.5"
                 fill="url(#textFillGradient)"
@@ -122,6 +125,7 @@ export function TextHoverEffect({
                     fontSize: "72px",
                     fontFamily: "system-ui, -apple-system, sans-serif",
                     fontWeight: 900,
+                    letterSpacing: "-0.01em",
                 }}
             >
                 {text}

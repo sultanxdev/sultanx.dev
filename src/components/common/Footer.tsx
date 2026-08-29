@@ -9,7 +9,7 @@ import { VisitorCounter } from './VisitorCounter';
 
 export default function Footer() {
   return (
-    <footer>
+    <footer className="mb-0 pb-0">
       <Container className="py-16">
         {/* Visitor counter */}
         <div className="mb-8">
@@ -48,12 +48,10 @@ export default function Footer() {
         </div>
       </Container>
 
-      {/* Large hover-effect text at the bottom */}
-      <Container className="pb-8">
-        <div className="relative h-[10rem] sm:h-[12rem] md:h-[16rem]">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <TextHoverEffect text="SULTAN" duration={0.5} />
-          </div>
+      {/* Large hover-effect text constrained to container with zero bottom gap */}
+      <Container className="pb-0 mb-0">
+        <div className="w-full flex items-end justify-center select-none overflow-hidden -mb-1">
+          <TextHoverEffect text="SULTAN" duration={0.5} />
         </div>
       </Container>
     </footer>
