@@ -16,16 +16,72 @@ import JavaScript from '@/components/technologies/JavaScript';
 import Vercel from '@/components/technologies/Vercel';
 import Render from '@/components/technologies/Render';
 import AWS from '@/components/technologies/AWS';
-import BullMQ from '@/components/technologies/BullMQ';
 import Redis from '@/components/technologies/Redis';
 import JWT from '@/components/technologies/JWT';
 import RabbitMQ from '@/components/technologies/RabbitMQ';
 
 export const projects: Project[] = [
+
+
+
+
+  {
+    // Zyvan — distributed systems backbone
+
+    title: 'Zyvan',
+    description:
+      'Webhook infrastructure that makes event delivery reliable from durable ingestion and idempotent processing to retries, failure recovery, replay, observability, and secure outbound delivery.',
+    image: '/project/zyvan/demo.png',
+    link: 'https://www.zyvan.in',
+    technologies: [
+      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'Express', icon: <ExpressJs key="express" /> },
+      { name: 'RabbitMQ', icon: <RabbitMQ key="rabbitmq" /> },
+      { name: 'Redis', icon: <Redis key="redis" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
+      { name: 'Prisma', icon: <Prisma key="prisma" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'AWS', icon: <AWS key="aws" /> },
+      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
+    ],
+    live: 'https://www.zyvan.dev',
+    details: true,
+    projectDetailsPageSlug: '/projects/zyvan',
+    isWorking: false,
+  },
+  {
+    title: 'Dermo',
+    description:
+      'AI employee for clinics that handles WhatsApp conversations, answers clinic-approved questions, captures and qualifies leads, manages appointments, and hands complex conversations to staff.',
+    image: '/project/dermo/hero.png',
+    link: '#',
+    technologies: [
+      { name: 'TypeScript', icon: <TypeScript key="dermo-typescript" /> },
+      { name: 'Next.js', icon: <NextJs key="dermo-nextjs" /> },
+      { name: 'React', icon: <ReactIcon key="dermo-react" /> },
+      { name: 'Node.js', icon: <NodeJs key="dermo-nodejs" /> },
+      { name: 'Express.js', icon: <ExpressJs key="dermo-express" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="dermo-postgresql" /> },
+      { name: 'Prisma', icon: <Prisma key="dermo-prisma" /> },
+      { name: 'Redis', icon: <Redis key="dermo-redis" /> },
+      { name: 'RabbitMQ', icon: <RabbitMQ key="rabbitmq" /> },
+      { name: 'Docker', icon: <Docker key="dermo-docker" /> },
+      { name: 'AWS', icon: <AWS key="dermo-aws" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="dermo-tailwind" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="dermo-shadcn" /> },
+    ],
+    github: 'https://github.com/sultanxdev/dermo',
+    live: 'https://dermoai.in',
+    details: true,
+    projectDetailsPageSlug: '/projects/dermo',
+    isWorking: false,
+  },
+
   // ─── LIVE PROJECTS ───────────────────────────────────────────────────
-
-
-
   // ✅ 1. Sendry — Second LIVE / running project
   {
     title: 'Sendry',
@@ -77,59 +133,6 @@ export const projects: Project[] = [
     details: true,
     projectDetailsPageSlug: '/projects/interviewmate',
     isWorking: true,
-  },
-  {
-    title: 'Waani',
-    description:
-      'India-first voice AI infrastructure for developers, combining telephony, realtime audio streaming, speech-to-text, LLM orchestration, text-to-speech, conversation state, and provider abstraction for production voice agents.',
-    image: '/project/waani/demo.png',
-    link: '#',
-    technologies: [
-      { name: 'TypeScript', icon: <TypeScript key="waani-typescript" /> },
-      { name: 'Node.js', icon: <NodeJs key="waani-nodejs" /> },
-      { name: 'PostgreSQL', icon: <PostgreSQL key="waani-postgresql" /> },
-      { name: 'Express.js', icon: <ExpressJs key="express" /> },
-      { name: 'Next.js', icon: <NextJs key="waani-nextjs" /> },
-      { name: 'React', icon: <ReactIcon key="waani-react" /> },
-      { name: 'WebSockets', icon: <ReactIcon key="waani-websocket" /> },
-      { name: 'Prisma', icon: <Prisma key="waani-prisma" /> },
-      { name: 'Docker', icon: <Docker key="waani-docker" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="waani-tailwind" /> },
-      { name: 'Shadcn UI', icon: <Shadcn key="waani-shadcn" /> },
-    ],
-    github: 'https://github.com/sultanxdev/waani',
-    live: 'https://github.com/sultanxdev/waani',
-    details: true,
-    projectDetailsPageSlug: '/projects/waani',
-    isWorking: false, // that means this in development phase..
-  },
-  {
-    // Zyvan — distributed systems backbone
-
-    title: 'Zyvan',
-    description:
-      'Production-grade webhook delivery infrastructure built on durable acknowledgment principles with idempotent ingestion, exponential retries, DLQ handling, and SSRF-safe outbound proxy architecture.',
-    image: '/project/zyvan/demo.png',
-    link: 'https://www.zyvan.in',
-    technologies: [
-      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
-      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
-      { name: 'Express', icon: <ExpressJs key="express" /> },
-      { name: 'BullMQ', icon: <BullMQ key="bullmq" /> },
-      { name: 'Redis', icon: <Redis key="redis" /> },
-      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
-      { name: 'Prisma', icon: <Prisma key="prisma" /> },
-      { name: 'Docker', icon: <Docker key="docker" /> },
-      { name: 'AWS', icon: <AWS key="aws" /> },
-      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
-      { name: 'React', icon: <ReactIcon key="react" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
-      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
-    ],
-    live: 'https://www.zyvan.dev',
-    details: true,
-    projectDetailsPageSlug: '/projects/zyvan',
-    isWorking: false,
   },
 ];
 // that means this in development phase..

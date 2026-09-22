@@ -1,0 +1,365 @@
+
+---
+
+title: 'Dermo — Managed AI Employee for Clinics'
+description: 'Managed AI employee for clinics that handles WhatsApp enquiries, answers clinic-approved questions with RAG, captures leads, manages appointments, and enables human handoff.'
+image: '/project/dermo/hero.png'
+technologies:
+[
+'Next.js',
+'TypeScript',
+'Node.js',
+'Express.js',
+'PostgreSQL',
+'Prisma',
+'pgvector',
+'RabbitMQ',
+'Docker',
+'React',
+'Tailwind CSS',
+'Shadcn UI',
+]
+github: 'https://github.com/sultanxdev/dermo'
+live: 'https://dermoai.in'
+timeline: '2026'
+role: 'Founder & Full Stack Engineer'
+team: 'Solo'
+status: 'in-progress'
+featured: true
+isPublished: true
+-----------------
+
+> **Active Development** — Dermo is being built as a managed AI employee for clinics, handling WhatsApp conversations, lead capture, appointments, and human handoff.
+
+## Overview
+
+Dermo is a managed AI employee for clinics that handles customer conversations through WhatsApp.
+
+Instead of asking clinics to build and operate their own AI system, Dermo manages the AI, knowledge retrieval, integrations, deployment, monitoring, and maintenance.
+
+The core workflow is:
+
+**WhatsApp → AI → Lead → Appointment → Human Handoff**
+
+Dermo is designed around a single-clinic deployment model rather than a generic multi-tenant SaaS platform.
+
+## The Problem
+
+Clinics receive repetitive enquiries about:
+
+* consultation fees
+* services
+* doctors
+* working hours
+* appointments
+* cancellations
+* rescheduling
+* treatment information
+
+Handling these conversations manually creates delayed responses, repetitive receptionist work, missed leads, and inconsistent follow-up.
+
+Dermo automates these interactions while keeping clinic staff involved whenever human judgment is required.
+
+## What I'm Building
+
+Dermo sits between the patient, the clinic, and its operational systems.
+
+A typical conversation looks like:
+
+```text
+Patient
+  ↓
+WhatsApp
+  ↓
+Dermo AI
+  ↓
+Answer / Retrieve Information
+  ↓
+Capture Lead
+  ↓
+Check Availability
+  ↓
+Book Appointment
+  ↓
+Confirm
+```
+
+For conversations that require human involvement:
+
+```text
+AI
+ ↓
+Human Handoff
+ ↓
+Clinic Staff
+```
+
+The AI does not invent clinic pricing or appointment availability. Business information and transactional state are controlled by backend services.
+
+## Dashboard
+
+The clinic dashboard provides:
+
+```text
+Overview
+Conversations
+Leads
+Appointments
+Services
+Doctors
+Knowledge
+WhatsApp
+Analytics
+Settings
+```
+
+Staff can view conversations, manage leads and appointments, update clinic information, manage knowledge, and take over AI conversations when necessary.
+
+## AI Architecture
+
+Dermo uses a structured AI pipeline rather than relying on a single large prompt:
+
+```text
+Message
+  ↓
+Intent
+  ↓
+Safety
+  ↓
+Conversation State
+  ↓
+RAG / Business Data
+  ↓
+Tool Calling
+  ↓
+Response Validation
+  ↓
+WhatsApp
+```
+
+The LLM handles language understanding and reasoning.
+
+Backend services control business state such as appointments, availability, services, leads, payments, and conversation mode.
+
+## RAG
+
+Clinic-approved information is stored and retrieved through PostgreSQL + pgvector.
+
+```text
+Clinic Knowledge
+      ↓
+Chunk
+      ↓
+Embed
+      ↓
+pgvector
+      ↓
+Retrieve
+      ↓
+LLM
+      ↓
+Grounded Response
+```
+
+This allows clinic information to change without hardcoding every answer directly into the prompt.
+
+The goal is simple:
+
+> **The AI should answer from approved clinic knowledge, not invent clinic facts.**
+
+## Controlled Tools
+
+The AI can request controlled operations such as:
+
+```text
+get_service_information()
+get_available_slots()
+create_lead()
+create_appointment()
+cancel_appointment()
+reschedule_appointment()
+create_handoff()
+```
+
+Backend services validate every operation before changing application state.
+
+Critical operations such as booking, cancellation, payment handling, and human takeover remain deterministic.
+
+## Appointment Consistency
+
+Appointments are treated as transactional operations.
+
+The system calculates availability from doctor schedules, working hours, breaks, and configured slot durations.
+
+During booking, availability is checked again before the appointment is committed.
+
+The goal is simple:
+
+> **Never confirm an appointment that the system cannot actually create.**
+
+## Human Handoff & Safety
+
+Dermo can hand conversations to staff when:
+
+* the patient explicitly requests a human
+* medical input requires staff involvement
+* the AI cannot answer reliably
+* an emergency signal is detected
+
+The conversation has an explicit operating mode:
+
+```text
+AI
+HUMAN_TAKEOVER
+```
+
+When staff takes over, automated AI responses stop until the conversation is released back to the AI.
+
+Dermo is not designed as a diagnostic or prescription system. Medical and emergency scenarios are handled through explicit safety rules and escalation paths.
+
+## Payments
+
+Dermo integrates appointment deposits into the booking workflow through Razorpay.
+
+```text
+Appointment Request
+       ↓
+Slot Validation
+       ↓
+Deposit
+       ↓
+Payment Confirmation
+       ↓
+Appointment Confirmation
+```
+
+Payment events such as successful captures, failures, and refunds are handled through backend webhooks.
+
+## Knowledge & Integrations
+
+Dermo is designed to connect clinic operations with familiar tools.
+
+```text
+Google Docs
+    ↓
+Clinic Knowledge
+    ↓
+Embeddings
+    ↓
+pgvector
+```
+
+and:
+
+```text
+WhatsApp Leads
+      ↓
+Dermo
+      ↓
+Google Sheets
+```
+
+This allows clinic staff to maintain operational information without directly managing the AI infrastructure.
+
+The goal is not just to make the AI respond, but to make the whole workflow observable when something goes wrong.
+
+## Architecture
+
+Dermo uses a modular monolith:
+
+```text
+Next.js Dashboard
+        ↓
+Express.js API
+        ↓
+Business Services
+        ↓
+PostgreSQL + pgvector
+        ↓
+AI / RAG / Tools
+        ↓
+WhatsApp / Razorpay
+```
+
+The architecture keeps business-critical logic inside the backend while allowing the AI layer to remain constrained and replaceable.
+
+The project is structured as a monorepo so the dashboard, API, shared contracts, and supporting packages can evolve together.
+
+## Security
+
+Security is treated as part of the application architecture.
+
+Sensitive credentials such as:
+
+```text
+WhatsApp Tokens
+LLM API Keys
+Razorpay Secrets
+Database Credentials
+```
+
+remain server-side and are managed through environment configuration.
+
+
+Sensitive operational events such as human takeover, appointment changes, refunds, and schedule changes are recorded through audit logging.
+
+
+The AI layer is also evaluated against a dedicated scenario suite covering its supported intent categories and multilingual inputs.
+
+The documented benchmark includes:
+
+```text
+207 / 207 scenarios passing
+English + Hindi + Hinglish
+Medical Safety Guardrail Coverage
+Intent Classification Coverage
+```
+
+## Current Status
+
+Dermo is actively being developed toward its first real clinic deployment.
+
+The focus is the complete operational path:
+
+**WhatsApp → AI → Knowledge → Lead → Appointment → Payment → Human Handoff → Dashboard**
+
+The core architecture, AI workflow, appointment engine, WhatsApp integration, payment workflow, knowledge retrieval, safety boundaries, and evaluation framework are being developed around that loop.
+
+## What This Project Demonstrates
+
+Dermo combines:
+
+```text
+Full-stack development
+WhatsApp API integration
+RAG
+LLM tool calling
+Conversation state
+AI safety boundaries
+Appointment consistency
+Async processing
+Idempotency
+Human-in-the-loop workflows
+Payment integration
+Security
+Observability
+Cloud deployment
+```
+
+The core engineering challenge is not simply using an LLM.
+
+It is building a reliable business system around one.
+
+## Why Dermo Exists
+
+Most AI projects stop at:
+
+**User → Prompt → LLM → Response**
+
+Dermo explores a more realistic system:
+
+**User → External Channel → Webhook → State → AI → Retrieval → Safety → Transaction → External API → Audit Trail**
+
+The objective is to make AI useful inside a real operational workflow without forcing the clinic to understand or operate the underlying infrastructure.
+
+> **Give clinics an AI employee they can use without having to operate the technology behind it.**
