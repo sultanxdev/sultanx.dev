@@ -21,25 +21,32 @@ import JWT from '@/components/technologies/JWT';
 import RabbitMQ from '@/components/technologies/RabbitMQ';
 
 export const projects: Project[] = [
+
+
+
+
   {
+    // Zyvan — distributed systems backbone
+
     title: 'Zyvan',
     description:
-      'High-availability infrastructure for reliable webhook and event delivery featuring durable ingestion, idempotent execution, decorrelated jitter retries, dead-letter recovery, and HMAC signing.',
+      'Webhook infrastructure that makes event delivery reliable from durable ingestion and idempotent processing to retries, failure recovery, replay, observability, and secure outbound delivery.',
     image: '/project/zyvan/demo.png',
-    link: 'https://www.zyvan.dev',
+    link: 'https://www.zyvan.in',
     technologies: [
-      { name: 'TypeScript', icon: <TypeScript key="zyvan-typescript" /> },
-      { name: 'Node.js', icon: <NodeJs key="zyvan-nodejs" /> },
-      { name: 'RabbitMQ', icon: <RabbitMQ key="zyvan-rabbitmq" /> },
-      { name: 'Redis', icon: <Redis key="zyvan-redis" /> },
-      { name: 'PostgreSQL', icon: <PostgreSQL key="zyvan-postgresql" /> },
-      { name: 'Prisma', icon: <Prisma key="zyvan-prisma" /> },
-      { name: 'Docker', icon: <Docker key="zyvan-docker" /> },
-      { name: 'AWS', icon: <AWS key="zyvan-aws" /> },
-      { name: 'Next.js', icon: <NextJs key="zyvan-nextjs" /> },
-      { name: 'React', icon: <ReactIcon key="zyvan-react" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="zyvan-tailwindcss" /> },
-      { name: 'Shadcn UI', icon: <Shadcn key="zyvan-shadcn" /> },
+      { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'Express', icon: <ExpressJs key="express" /> },
+      { name: 'RabbitMQ', icon: <RabbitMQ key="rabbitmq" /> },
+      { name: 'Redis', icon: <Redis key="redis" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
+      { name: 'Prisma', icon: <Prisma key="prisma" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'AWS', icon: <AWS key="aws" /> },
+      { name: 'Next.js', icon: <NextJs key="nextjs" /> },
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
     ],
     live: 'https://www.zyvan.dev',
     details: true,
@@ -49,9 +56,9 @@ export const projects: Project[] = [
   {
     title: 'Dermo',
     description:
-      'Autonomous AI employee for clinics that handles WhatsApp patient inquiries, retrieves clinic-approved knowledge with RAG, manages transactional appointments, and coordinates human handoff.',
+      'AI employee for clinics that handles WhatsApp conversations, answers clinic-approved questions, captures and qualifies leads, manages appointments, and hands complex conversations to staff.',
     image: '/project/dermo/hero.png',
-    link: 'https://dermoai.in',
+    link: '#',
     technologies: [
       { name: 'TypeScript', icon: <TypeScript key="dermo-typescript" /> },
       { name: 'Next.js', icon: <NextJs key="dermo-nextjs" /> },
@@ -61,7 +68,7 @@ export const projects: Project[] = [
       { name: 'PostgreSQL', icon: <PostgreSQL key="dermo-postgresql" /> },
       { name: 'Prisma', icon: <Prisma key="dermo-prisma" /> },
       { name: 'Redis', icon: <Redis key="dermo-redis" /> },
-      { name: 'RabbitMQ', icon: <RabbitMQ key="dermo-rabbitmq" /> },
+      { name: 'RabbitMQ', icon: <RabbitMQ key="rabbitmq" /> },
       { name: 'Docker', icon: <Docker key="dermo-docker" /> },
       { name: 'AWS', icon: <AWS key="dermo-aws" /> },
       { name: 'Tailwind CSS', icon: <TailwindCss key="dermo-tailwind" /> },
@@ -73,23 +80,26 @@ export const projects: Project[] = [
     projectDetailsPageSlug: '/projects/dermo',
     isWorking: false,
   },
+
+  // ─── LIVE PROJECTS ───────────────────────────────────────────────────
+  // ✅ 1. Sendry — Second LIVE / running project
   {
     title: 'Sendry',
     description:
-      'Event-driven API observability platform featuring sub-2ms asynchronous telemetry ingestion, RabbitMQ buffering, dual-database analytics architecture, circuit breakers, and real-time monitoring dashboards.',
+      'Event-driven API observability platform featuring asynchronous telemetry ingestion, RabbitMQ-powered processing, dead-letter queues, circuit breakers, idempotent event handling, dual-database analytics architecture, and real-time monitoring dashboards.',
     image: '/project/sendry/hero.png',
     link: 'https://sendry.in',
     technologies: [
-      { name: 'React', icon: <ReactIcon key="sendry-react" /> },
-      { name: 'Node.js', icon: <NodeJs key="sendry-nodejs" /> },
-      { name: 'Express.js', icon: <ExpressJs key="sendry-express" /> },
-      { name: 'MongoDB', icon: <MongoDB key="sendry-mongodb" /> },
-      { name: 'PostgreSQL', icon: <PostgreSQL key="sendry-postgresql" /> },
-      { name: 'RabbitMQ', icon: <RabbitMQ key="sendry-rabbitmq" /> },
-      { name: 'Redis', icon: <Redis key="sendry-redis" /> },
-      { name: 'JWT', icon: <JWT key="sendry-jwt" /> },
-      { name: 'Docker', icon: <Docker key="sendry-docker" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="sendry-tailwindcss" /> },
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'Express.js', icon: <ExpressJs key="express" /> },
+      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
+      { name: 'PostgreSQL', icon: <PostgreSQL key="postgresql" /> },
+      { name: 'RabbitMQ', icon: <RabbitMQ key="rabbitmq" /> },
+      { name: 'JWT', icon: <JWT key="jwt" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'Redis', icon: <Redis key="redis" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
     ],
     github: 'https://github.com/sultanxdev/sendry',
     live: 'https://sendry.in',
@@ -97,25 +107,26 @@ export const projects: Project[] = [
     projectDetailsPageSlug: '/projects/sendry',
     isWorking: true,
   },
+  // 2. InterviewMate — AI interview simulator
   {
-    title: 'InterviewMate',
+    title: 'Interviewmate',
     description:
-      'Voice-first AI mock interview simulator featuring low-latency conversational audio, decoupled asynchronous evaluation pipelines, multi-model fallback cascades, and structured performance analytics.',
+      'InterviewMate is an AI-powered mock interview platform that lets users practice realistic interviews through live voice conversations...',
     image: '/project/interviewmate-hero.png',
     link: 'https://interviewmate-xi.vercel.app/',
     technologies: [
-      { name: 'React', icon: <ReactIcon key="im-react" /> },
-      { name: 'Node.js', icon: <NodeJs key="im-nodejs" /> },
-      { name: 'MongoDB', icon: <MongoDB key="im-mongodb" /> },
-      { name: 'Mongoose', icon: <Mongoose key="im-mongoose" /> },
-      { name: 'Socket.IO', icon: <SocketIo key="im-socketio" /> },
-      { name: 'Express.js', icon: <ExpressJs key="im-express" /> },
-      { name: 'JavaScript', icon: <JavaScript key="im-javascript" /> },
-      { name: 'Tailwind CSS', icon: <TailwindCss key="im-tailwindcss" /> },
-      { name: 'Shadcn UI', icon: <Shadcn key="im-shadcn" /> },
-      { name: 'Docker', icon: <Docker key="im-docker" /> },
-      { name: 'Vercel', icon: <Vercel key="im-vercel" /> },
-      { name: 'Render', icon: <Render key="im-render" /> },
+      { name: 'React', icon: <ReactIcon key="react" /> },
+      { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
+      { name: 'MongoDB', icon: <MongoDB key="mongodb" /> },
+      { name: 'Mongoose', icon: <Mongoose key="mongoose" /> },
+      { name: 'Socket.IO', icon: <SocketIo key="socketio" /> },
+      { name: 'Express.js', icon: <ExpressJs key="express" /> },
+      { name: 'JavaScript', icon: <JavaScript key="javascript" /> },
+      { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
+      { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
+      { name: 'Docker', icon: <Docker key="docker" /> },
+      { name: 'Vercel', icon: <Vercel key="vercel" /> },
+      { name: 'Render', icon: <Render key="render" /> },
     ],
     github: 'https://github.com/sultanxdev/interviewmate',
     live: 'https://interviewmate-xi.vercel.app/',
@@ -124,3 +135,6 @@ export const projects: Project[] = [
     isWorking: true,
   },
 ];
+// that means this in development phase..
+
+
