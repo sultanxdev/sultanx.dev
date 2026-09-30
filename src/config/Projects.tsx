@@ -32,7 +32,7 @@ export const projects: Project[] = [
     description:
       'Webhook infrastructure that makes event delivery reliable from durable ingestion and idempotent processing to retries, failure recovery, replay, observability, and secure outbound delivery.',
     image: '/project/zyvan/demo.png',
-    link: 'https://www.zyvan.in',
+    link: 'https://www.zyvan.dev',
     technologies: [
       { name: 'TypeScript', icon: <TypeScript key="typescript" /> },
       { name: 'Node.js', icon: <NodeJs key="nodejs" /> },
@@ -48,6 +48,7 @@ export const projects: Project[] = [
       { name: 'Tailwind CSS', icon: <TailwindCss key="tailwindcss" /> },
       { name: 'Shadcn UI', icon: <Shadcn key="shadcn" /> },
     ],
+    github: 'https://github.com/sultanxdev/zyvan',
     live: 'https://www.zyvan.dev',
     details: true,
     projectDetailsPageSlug: '/projects/zyvan',
@@ -58,7 +59,7 @@ export const projects: Project[] = [
     description:
       'AI employee for clinics that handles WhatsApp conversations, answers clinic-approved questions, captures and qualifies leads, manages appointments, and hands complex conversations to staff.',
     image: '/project/dermo/hero.png',
-    link: '#',
+    link: 'https://github.com/sultanxdev/dermo',
     technologies: [
       { name: 'TypeScript', icon: <TypeScript key="dermo-typescript" /> },
       { name: 'Next.js', icon: <NextJs key="dermo-nextjs" /> },
