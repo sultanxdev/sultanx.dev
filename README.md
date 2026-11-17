@@ -125,34 +125,6 @@ The project uses configuration files in the `src/config` directory for easy cust
 - `Setup.tsx` - Development setup information
 - `cat.ts` - Enable disable the cat
 
-## Adding New Technology Icons
-
-1. Visit [Devicon](https://devicon.dev/) to find the icon you want to add
-2. Create a new component in `src/components/technologies/`
-3. Follow the existing component structure for consistency
-
-Example:
-
-```tsx
-export const NewTechIcon = () => {
-  return <svg>// SVG content from devicon</svg>;
-};
-```
-
-## Adding Content
-
-### Blog Posts
-
-1. Create a new MDX file in `src/data/blog/`
-2. Add metadata and content following existing post structure
-3. Add blog thumbnail in `public/blog/`
-
-### Projects
-
-1. Create a new MDX file in `src/data/projects/`
-2. Add metadata and content following existing project structure
-3. Add project thumbnail in `public/project/`
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
