@@ -88,7 +88,7 @@ export const projects: Project[] = [
     title: 'Sendry',
     description:
       'Event-driven API observability platform featuring asynchronous telemetry ingestion, RabbitMQ-powered processing, dead-letter queues, circuit breakers, idempotent event handling, dual-database analytics architecture, and real-time monitoring dashboards.',
-    image: '/project/sendry/hero.png',
+    image: '/project/sendry/hero.svg',
     link: 'https://sendry.in',
     technologies: [
       { name: 'React', icon: <ReactIcon key="react" /> },
