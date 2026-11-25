@@ -375,3 +375,26 @@
     animation: none;
   }
 }
+
+@keyframes ascii-wave-band {
+  0%,
+  100% {
+    transform: translateY(-0.45px);
+    opacity: 0.92;
+  }
+  50% {
+    transform: translateY(0.45px);
+    opacity: 1;
+  }
+}
+
+.ascii-wave-band {
+  animation: ascii-wave-band 3.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ascii-wave-band {
+    animation: none;
+  }
+}
