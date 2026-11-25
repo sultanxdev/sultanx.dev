@@ -322,7 +322,7 @@ export default function AsciiPortrait({ alt, className = '' }: AsciiPortraitProp
             width={ASCII_SVG_VIEWBOX_SIZE}
             height={ASCII_SVG_VIEWBOX_SIZE}
             preserveAspectRatio="xMidYMid slice"
-            opacity={0.28}
+            opacity={0.38}
           />
           <g
             fontFamily="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
