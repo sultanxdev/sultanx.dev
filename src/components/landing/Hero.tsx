@@ -1,229 +1,130 @@
 'use client';
 
 import { heroConfig, skillComponents, socialLinks } from '@/config/Hero';
-import { parseTemplate } from '@/lib/hero';
-import { cn } from '@/lib/utils';
 import { Link } from 'next-view-transitions';
-import Image from 'next/image';
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React from 'react';
 
 import Container from '../common/Container';
-import Skill from '../common/Skill';
-import CV from '../svgs/CV';
-import Chat from '../svgs/Chat';
-import { Button } from '../ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-
-const CHARS =
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-function ScrambleText({
-  text,
-  className = '',
-}: {
-  text: string;
-  className?: string;
-}) {
-  const [display, setDisplay] = useState(text);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const frameRef = useRef(0);
-
-  const scramble = useCallback(() => {
-    frameRef.current = 0;
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => {
-      frameRef.current += 1;
-      setDisplay(
-        text
-          .split('')
-          .map((char, i) =>
-            i < frameRef.current
-              ? char
-              : CHARS[Math.floor(Math.random() * CHARS.length)],
-          )
-          .join(''),
-      );
-      if (frameRef.current >= text.length) {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-      }
-    }, 28);
-  }, [text]);
-
-  const reset = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setDisplay(text);
-  }, [text]);
-
-  useEffect(
-    () => () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    },
-    [],
-  );
-
-  return (
-    <span
-      onMouseEnter={scramble}
-      onMouseLeave={reset}
-      className={`cursor-default font-mono ${className}`}
-      style={{ minWidth: `${text.length}ch`, display: 'inline-block' }}
-    >
-      {display}
-    </span>
-  );
-}
-
-/* Typing cursor blink */
-function Cursor() {
-  return (
-    <span className="ml-0.5 inline-block h-[1.1em] w-[2px] animate-pulse bg-primary align-middle" />
-  );
-}
-
-const buttonIcons = {
-  CV: CV,
-  Chat: Chat,
-};
+import AsciiPortrait from './AsciiPortrait';
 
 export default function Hero() {
-  const { name, title, avatar, skills, description, buttons } = heroConfig;
-
-  const renderDescription = () => {
-    const parts = parseTemplate(description.template, skills);
-
-    return parts.map((part) => {
-      if (part.type === 'skill' && 'skill' in part && part.skill) {
-        const SkillComponent =
-          skillComponents[part.skill.component as keyof typeof skillComponents];
-        return (
-          <Skill key={part.key} name={part.skill.name} href={part.skill.href}>
-            <SkillComponent />
-          </Skill>
-        );
-      } else if (part.type === 'bold' && 'text' in part) {
-        return (
-          <strong
-            key={part.key}
-            className="text-foreground font-medium whitespace-pre-wrap"
-          >
-            {part.text}
-          </strong>
-        );
-      } else if (part.type === 'text' && 'text' in part) {
-        return (
-          <span key={part.key} className="whitespace-pre-wrap">
-            {part.text}
-          </span>
-        );
-      }
-      return null;
-    });
-  };
+  const { name, heading, title, availability, status, avatar, bio, skills } =
+    heroConfig;
 
   return (
-    <Container className="mx-auto max-w-5xl">
-      {/* Availability badge */}
-      <div className="mb-8">
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 px-3 py-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          Available for opportunities
-        </span>
-      </div>
+    <Container className="pt-1 sm:pt-4">
+      <div className="border-border/60 border-b pb-5 sm:pb-11">
+        <div className="grid grid-cols-[88px_minmax(0,1fr)] items-center gap-x-3.5 gap-y-3.5 text-left sm:flex sm:flex-row sm:items-start sm:gap-8">
+          {/* Left track on sm+ (Portrait + Actions); CSS contents on mobile for custom grid flow */}
+          <div className="contents sm:flex sm:w-[196px] sm:shrink-0 sm:flex-col sm:gap-2">
+            <AsciiPortrait
+              src={avatar}
+              alt={name}
+              cellSize={3.4}
+              sizes="(max-width: 639px) 88px, 196px"
+              className="col-start-1 row-start-2 size-[88px] rounded-[14px] border-[1.5px] border-black/15 shadow-md sm:size-[196px] dark:border-white/15"
+            />
 
-      {/* Avatar + name row */}
-      <div className="mb-8 flex items-center gap-5">
-        <Image
-          src={avatar}
-          alt="hero"
-          width={100}
-          height={100}
-          className="size-20 shrink-0 rounded-2xl bg-blue-300 ring-2 ring-border/60 shadow-md transition-all duration-300 hover:ring-primary/40 dark:bg-yellow-300"
-          priority
-        />
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-balance sm:text-3xl">
-            {'Hi, I\u2019m '}
-            <ScrambleText text={name} className="text-primary" />
-            <Cursor />
-          </h1>
-          <p className="text-muted-foreground mt-1.5 text-lg">
-            {title}
-          </p>
-        </div>
-      </div>
-
-      {/* Bio with inline tech skills */}
-      <div className="mb-8 flex max-w-2xl flex-wrap items-center gap-x-1.5 gap-y-2 text-base leading-relaxed text-neutral-500 whitespace-pre-wrap md:text-lg">
-        {renderDescription()}
-      </div>
-
-      {/* CTA Buttons */}
-      <div className="mb-8 flex flex-wrap items-center gap-3">
-        {buttons.map((button, index) => {
-          const IconComponent =
-            buttonIcons[button.icon as keyof typeof buttonIcons];
-          return (
-            <Button
-              key={index}
-              variant={button.variant as 'outline' | 'default'}
-              className={cn(
-                'group gap-2 transition-all duration-200',
-                button.variant === 'default' &&
-                'bg-foreground text-background hover:opacity-90',
-              )}
-            >
-              {IconComponent && <IconComponent />}
-              <Link href={button.href}>{button.text}</Link>
-              {button.variant === 'default' ? (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  className="transition-transform duration-200 group-hover:translate-x-0.5"
-                >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
-                </svg>
-              ) : (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                >
-                  <path d="M7 17L17 7M17 7H7M17 7V17" />
-                </svg>
-              )}
-            </Button>
-          );
-        })}
-      </div>
-
-      {/* Social Links */}
-      <div className="flex items-center gap-1">
-        {socialLinks.map((link) => (
-          <Tooltip key={link.name} delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Link
-                href={link.href}
-                className="text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg p-2.5 transition-all duration-200 hover:scale-110"
+            <div className="col-span-2 row-start-4 flex w-full flex-col items-stretch gap-2">
+              <div
+                aria-label="Social links"
+                className="flex w-full items-center justify-between gap-1 rounded-lg border border-black/10 bg-black/[0.02] px-2.5 py-1.5 sm:px-2 dark:border-white/10 dark:bg-white/[0.03]"
               >
-                <span className="size-5 block">{link.icon}</span>
+                {socialLinks.map((link) => (
+                  <Tooltip key={link.name} delayDuration={0}>
+                    <TooltipTrigger asChild>
+                      <Link
+                        href={link.href}
+                        target={
+                          link.href.startsWith('mailto:') ? undefined : '_blank'
+                        }
+                        aria-label={link.name}
+                        className="text-secondary hover:text-foreground inline-flex h-8 flex-1 items-center justify-center rounded-md transition-colors hover:bg-black/5 sm:h-7 dark:hover:bg-white/10"
+                      >
+                        <span className="block size-3.5">{link.icon}</span>
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{link.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+
+              <Link
+                href="/contact"
+                className="bg-foreground text-background inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[0.85rem] font-semibold whitespace-nowrap transition-opacity hover:opacity-90 sm:px-3.5 sm:py-2"
+              >
+                <span>Get in touch</span>
+                <span aria-hidden="true">&rarr;</span>
               </Link>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>{link.name}</p>
-            </TooltipContent>
-          </Tooltip>
-        ))}
+            </div>
+          </div>
+
+          {/* Right column on sm+; places Badge on row 1, Identity beside Portrait on row 2, Body on row 3 on mobile */}
+          <div className="contents sm:flex sm:min-w-0 sm:flex-1 sm:flex-col sm:justify-start">
+            <span className="col-span-2 row-start-1 mb-0 inline-flex items-center gap-1.5 justify-self-start rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-emerald-700 sm:mb-3 sm:self-start sm:px-3 dark:text-emerald-400">
+              <span className="relative flex size-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+              </span>
+              {availability}
+            </span>
+
+            <div className="col-start-2 row-start-2 flex min-w-0 flex-col items-start">
+              <h1 className="text-foreground text-[clamp(1.38rem,5.5vw,1.72rem)] leading-[1.1] font-extrabold tracking-[-0.035em] sm:text-[2.45rem] sm:leading-[1.06]">
+                {heading}
+              </h1>
+
+              <p className="text-secondary mt-1.5 flex flex-wrap items-center gap-1.5 text-[0.85rem] font-medium sm:mt-2 sm:gap-2 sm:text-[0.95rem]">
+                <strong className="text-foreground font-semibold">
+                  {title}
+                </strong>
+                <span className="inline-flex items-center gap-1.5 rounded-md border border-green-500/25 bg-green-500/10 px-2 py-0.5 text-[11px] font-semibold text-green-700 sm:text-xs dark:text-green-400">
+                  <span className="size-1.5 animate-pulse rounded-full bg-green-500" />
+                  {status}
+                </span>
+              </p>
+            </div>
+
+            <div className="col-span-2 row-start-3 min-w-0 sm:mt-3.5">
+              <p className="text-secondary text-[0.92rem] leading-[1.6] sm:text-[0.95rem] sm:leading-[1.65]">
+                {bio}
+              </p>
+
+              <div className="mt-4 w-full sm:mt-4.5" aria-label="Core technologies">
+                <p className="text-secondary text-xs font-bold tracking-wider uppercase">
+                  Core Technologies
+                </p>
+                <div className="mt-2 flex flex-nowrap justify-start gap-1 overflow-x-auto [scrollbar-width:none] sm:flex-wrap sm:gap-1.5 sm:overflow-visible [&::-webkit-scrollbar]:hidden">
+                  {skills.map((skill) => {
+                    const SkillComponent =
+                      skillComponents[
+                        skill.component as keyof typeof skillComponents
+                      ];
+                    return (
+                      <Link
+                        key={skill.name}
+                        href={skill.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="skill-inner-shadow inline-flex shrink-0 items-center gap-1 rounded-md border border-black/10 bg-black/[0.02] px-1.5 py-1 text-[10.5px] font-semibold text-neutral-800 transition-transform duration-150 hover:-translate-y-0.5 sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs dark:border-white/10 dark:bg-white/[0.04] dark:text-neutral-200"
+                      >
+                        {SkillComponent && (
+                          <span className="size-3 shrink-0 sm:size-3.5">
+                            <SkillComponent />
+                          </span>
+                        )}
+                        <span>{skill.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </Container>
   );

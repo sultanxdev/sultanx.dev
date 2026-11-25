@@ -280,3 +280,98 @@
 .animate-marquee {
   animation: marquee 25s linear infinite;
 }
+
+@keyframes parsona-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.about-company-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18rem;
+  font-weight: 700;
+  text-decoration: none;
+  background: linear-gradient(
+    110deg,
+    #6d28d9 0%,
+    #8b5cf6 35%,
+    #d946ef 50%,
+    #8b5cf6 65%,
+    #6d28d9 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: parsona-shimmer 3.8s ease-in-out infinite;
+}
+
+.dark .about-company-link {
+  background: linear-gradient(
+    110deg,
+    #a78bfa 0%,
+    #c4b5fd 35%,
+    #f5d0fe 50%,
+    #c4b5fd 65%,
+    #a78bfa 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.about-company-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1.5px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    90deg,
+    rgba(139, 92, 246, 0.35),
+    rgba(217, 70, 239, 0.75),
+    rgba(139, 92, 246, 0.35)
+  );
+  transform: scaleX(0.35);
+  transform-origin: left center;
+  opacity: 0.75;
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.25s ease;
+}
+
+.about-company-link:hover::after {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.about-company-arrow {
+  font-size: 0.76em;
+  line-height: 1;
+  color: #8b5cf6;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dark .about-company-arrow {
+  color: #c4b5fd;
+}
+
+.about-company-link:hover .about-company-arrow {
+  transform: translate(2px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-company-link {
+    animation: none;
+  }
+}

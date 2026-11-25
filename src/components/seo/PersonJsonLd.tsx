@@ -11,7 +11,7 @@ export default function PersonJsonLd() {
     '@type': 'Person',
     name: siteConfig.author.name,
     url: siteConfig.url,
-    image: `${siteConfig.url}/assets/logo.jpg`,
+    image: `${siteConfig.url}/assets/logo.png`,
     jobTitle: 'Full Stack Engineer',
     description: siteConfig.description,
     email: siteConfig.author.email,

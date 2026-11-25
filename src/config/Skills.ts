@@ -25,7 +25,7 @@ export interface SkillGroup {
 
 export const skillGroups: SkillGroup[] = [
     {
-        label: 'Frontend',
+        label: 'Frontend & UI',
         iconPath:
             '<rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="9" y1="21" x2="9" y2="9" />',
         skills: [
@@ -34,10 +34,9 @@ export const skillGroups: SkillGroup[] = [
             { name: 'Tailwind CSS', color: '#06b6d4' },
             { name: 'Shadcn UI', color: '#0b0b0bff' },
             { name: 'Framer Motion', color: '#62ce6bff' },
-            { name: 'GSAP', color: '#888888' },
-            //{ name: 'Three.js', color: '#888888' },
-            //{ name: 'WebGL', color: '#888888' },
-            //{ name: 'Vite', color: '#888888' },
+            { name: 'GSAP', color: '#0ae448' },
+            { name: 'TanStack Query', color: '#ff4154' },
+            { name: 'Zustand', color: '#764abc' },
         ],
     },
     {
@@ -45,37 +44,15 @@ export const skillGroups: SkillGroup[] = [
         iconPath:
             '<rect x="2" y="2" width="20" height="8" rx="2" ry="2" /><rect x="2" y="14" width="20" height="8" rx="2" ry="2" /><line x1="6" y1="6" x2="6.01" y2="6" /><line x1="6" y1="18" x2="6.01" y2="18" />',
         skills: [
-            // runtime & api
             { name: 'Node.js', color: '#339933' },
             { name: 'Express', color: '#888888' },
             { name: 'Socket.IO', color: '#010101' },
-
-            // orm / odm
             { name: 'Prisma', color: '#2d3748' },
             { name: 'Mongoose', color: '#800' },
-
-            // databases
             { name: 'PostgreSQL', color: '#4169e1' },
             { name: 'MongoDB', color: '#4db33d' },
             { name: 'Redis', color: '#dc382d' },
-
-            // queues
-    
-        ],
-    },
-    {
-        label: 'DevOps & Cloud',
-        iconPath:
-            '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />',
-        skills: [
-            { name: 'Docker', color: '#2496ed' },
-            { name: 'GitHub Actions', color: '#2088ff' },
-            { name: 'CI/CD', color: '#ff6b6b' },
-            { name: 'AWS EC2', color: '#ff9900' },
-            { name: 'AWS S3', color: '#ff9900' },
-            { name: 'AWS RDS', color: '#ff9900' },
-            { name: 'Vercel', color: '#888888' },
-            { name: 'Render', color: '#46e3b7' },
+            { name: 'RabbitMQ', color: '#ff6600' },
         ],
     },
     {
@@ -86,9 +63,42 @@ export const skillGroups: SkillGroup[] = [
             { name: 'TypeScript', color: '#3178c6' },
             { name: 'JavaScript', color: '#f7df1e' },
             { name: 'Python', color: '#3776ab' },
-            { name: 'C', color: '#ce422b' },
-            { name: 'C++', color: '#5f180dff' },
-        ]
+            { name: 'SQL', color: '#336791' },
+            { name: 'C++', color: '#00599c' },
+            { name: 'C', color: '#00599c' },
+        ],
+    },
+    {
+        label: 'DevOps & Cloud',
+        iconPath:
+            '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />',
+        skills: [
+            { name: 'Docker', color: '#2496ed' },
+            { name: 'Git', color: '#f05032' },
+            { name: 'GitHub Actions', color: '#2088ff' },
+            { name: 'CI/CD', color: '#ff6b6b' },
+            { name: 'Linux', color: '#fcc624' },
+            { name: 'AWS EC2', color: '#ff9900' },
+            { name: 'AWS S3', color: '#ff9900' },
+            { name: 'AWS RDS', color: '#ff9900' },
+            { name: 'Cloudflare', color: '#f38020' },
+            { name: 'Vercel', color: '#888888' },
+            { name: 'Render', color: '#46e3b7' },
+        ],
+    },
+    {
+        label: 'AI & Integrations',
+        iconPath:
+            '<path d="M12 3l1.912 5.813a2 2 0 0 0 1.275 1.275L21 12l-5.813 1.912a2 2 0 0 0-1.275 1.275L12 21l-1.912-5.813a2 2 0 0 0-1.275-1.275L3 12l5.813-1.912a2 2 0 0 0 1.275-1.275L12 3z" />',
+        skills: [
+            { name: 'Google Gemini API', color: '#4285f4' },
+            { name: 'OpenAI API', color: '#10a37f' },
+            { name: 'LangChain', color: '#1c3c3c' },
+            { name: 'RAG', color: '#8b5cf6' },
+            { name: 'Embeddings', color: '#a855f7' },
+            { name: 'pgvector', color: '#336791' },
+            { name: 'Function Calling', color: '#ec4899' },
+        ],
     },
 ];
 

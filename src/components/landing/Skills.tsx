@@ -6,6 +6,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import Container from "../common/Container";
 import SectionHeading from "../common/SectionHeading";
 import { Reveal } from "../reveal";
+import SkillIcon from "./SkillIcon";
 
 const CHARS =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -75,6 +76,14 @@ function GroupIcon({ iconPath }: { iconPath: string }) {
     );
 }
 
+const BENTO_SPAN_BY_LABEL: Record<string, string> = {
+    "Frontend & UI": "md:col-span-6",
+    "Backend & Databases": "md:col-span-6",
+    Languages: "md:col-span-5",
+    "DevOps & Cloud": "md:col-span-7",
+    "AI & Integrations": "md:col-span-12",
+};
+
 /* Flatten all skills for the marquee strip */
 const allSkills = skillGroups.flatMap((g) => g.skills);
 
@@ -86,28 +95,36 @@ export default function Skills() {
                 heading={skillsHeading.heading}
             />
 
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-12">
                 {skillGroups.map((group, i) => (
-                    <Reveal key={group.label} delay={0.08 * (i + 1)}>
-                        <div className="group h-full rounded-xl border border-dashed border-black/20 bg-black/[0.02] p-5 transition-all duration-300 hover:border-black/30 hover:bg-black/[0.04] dark:border-white/10 dark:bg-white/[0.02] dark:hover:border-white/20 dark:hover:bg-white/[0.04]">
-                            <div className="mb-4 flex items-center gap-2">
-                                <div className="text-foreground/70 flex h-7 w-7 items-center justify-center rounded-md bg-black/5 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 dark:bg-white/10">
-                                    <GroupIcon iconPath={group.iconPath} />
+                    <Reveal
+                        key={group.label}
+                        delay={0.08 * (i + 1)}
+                        className={BENTO_SPAN_BY_LABEL[group.label] ?? "md:col-span-6"}
+                    >
+                        <div className="group flex h-full flex-col justify-between rounded-xl border border-dashed border-black/20 bg-black/[0.02] p-5 transition-all duration-300 hover:border-black/30 hover:bg-black/[0.04] dark:border-white/10 dark:bg-white/[0.02] dark:hover:border-white/20 dark:hover:bg-white/[0.04]">
+                            <div className="mb-4 flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                    <div className="text-foreground/70 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-black/5 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110 dark:bg-white/10">
+                                        <GroupIcon iconPath={group.iconPath} />
+                                    </div>
+                                    <h3 className="text-muted-foreground text-xs font-bold uppercase tracking-widest">
+                                        {group.label}
+                                    </h3>
                                 </div>
-                                <h3 className="text-muted-foreground text-xs font-bold uppercase tracking-widest">
-                                    {group.label}
-                                </h3>
+                                <span className="text-muted-foreground/60 rounded-md border border-black/10 px-1.5 py-0.5 font-mono text-[10px] dark:border-white/10">
+                                    {String(group.skills.length).padStart(2, "0")}
+                                </span>
                             </div>
-                            <div className="flex flex-wrap gap-2">
+                            <div className="flex flex-1 flex-wrap content-start gap-2">
                                 {group.skills.map((skill) => (
                                     <span
                                         key={skill.name}
-                                        className="group/skill skill-inner-shadow inline-flex cursor-default select-none items-center gap-2 rounded-lg border border-black/10 bg-black/[0.03] px-3 py-1.5 font-mono text-xs font-medium transition-all duration-200 hover:border-black/20 hover:bg-black/[0.06] dark:border-white/10 dark:bg-white/[0.05] dark:hover:border-white/20 dark:hover:bg-white/[0.08]"
+                                        className="group/skill skill-inner-shadow inline-flex min-w-fit flex-1 cursor-default select-none items-center justify-center gap-2 rounded-lg border border-black/10 bg-black/[0.03] px-3 py-1.5 font-mono text-xs font-medium transition-all duration-200 hover:border-black/20 hover:bg-black/[0.06] dark:border-white/10 dark:bg-white/[0.05] dark:hover:border-white/20 dark:hover:bg-white/[0.08]"
                                     >
-                                        <span
-                                            className="h-2 w-2 shrink-0 rounded-full transition-transform duration-200 group-hover/skill:scale-150"
-                                            style={{ backgroundColor: skill.color }}
-                                        />
+                                        <span className="size-4 shrink-0 transition-transform duration-200 group-hover/skill:scale-110">
+                                            <SkillIcon name={skill.name} color={skill.color} />
+                                        </span>
                                         <ScrambleLabel text={skill.name} />
                                     </span>
                                 ))}
@@ -124,12 +141,11 @@ export default function Skills() {
                         {[...allSkills, ...allSkills].map((s, i) => (
                             <span
                                 key={`${s.name}-${i}`}
-                                className="text-muted-foreground/60 inline-flex select-none items-center gap-2 font-mono text-xs"
+                                className="text-muted-foreground/80 inline-flex select-none items-center gap-2 font-mono text-xs"
                             >
-                                <span
-                                    className="h-1.5 w-1.5 rounded-full"
-                                    style={{ backgroundColor: s.color, opacity: 0.6 }}
-                                />
+                                <span className="size-3.5 shrink-0 opacity-85">
+                                    <SkillIcon name={s.name} color={s.color} />
+                                </span>
                                 {s.name}
                             </span>
                         ))}

@@ -54,20 +54,19 @@ export const skillComponents = {
 export const heroConfig = {
   // Personal Information
   name: 'Sultan Alam',
-  title: 'Full Stack & AI Engineer',
-  avatar: '/assets/logo.jpg',
+  heading: "Hi I'm Shaikh Sultan",
+  title: 'Full-Stack & AI Engineer',
+  availability: 'Available for opportunities',
+  status: 'Building Parsona',
+  avatar: '/assets/logo.png',
+  bio: 'I build full-stack web applications and AI-powered products, working across frontend & backend engineering and cloud infrastructure. I focus on building scalable, reliable systems and transforming product ideas into maintainable software.',
 
-  // Skills Configuration
+  // Core Technologies Configuration
   skills: [
     {
-      name: 'Typescript',
+      name: 'TypeScript',
       href: 'https://www.typescriptlang.org/',
       component: 'TypeScript',
-    },
-    {
-      name: 'React',
-      href: 'https://react.dev/',
-      component: 'ReactIcon',
     },
     {
       name: 'Next.js',
@@ -75,24 +74,29 @@ export const heroConfig = {
       component: 'NextJs',
     },
     {
-      name: 'AWS',
-      href: 'https://aws.amazon.com/',
-      component: 'AWS',
+      name: 'Node.js',
+      href: 'https://nodejs.org/',
+      component: 'NodeJs',
     },
     {
       name: 'PostgreSQL',
       href: 'https://www.postgresql.org/',
       component: 'PostgreSQL',
     },
+    {
+      name: 'AWS',
+      href: 'https://aws.amazon.com/',
+      component: 'AWS',
+    },
   ],
 
   // Description Configuration
   description: {
     template:
-      'I build interactive web apps using {skills:0}, {skills:1}, {skills:2}, {skills:3} and {skills:4}. With a focus on clean architecture and polished <b>UI</b> design.',
+      'I build scalable web apps using {skills:0}, {skills:1}, {skills:2}, {skills:3} and {skills:4}. With a focus on clean architecture and polished <b>UI</b> design.',
   },
 
-  // Buttons Configuratio
+  // Buttons Configuration
   buttons: [
     {
       variant: 'outline',

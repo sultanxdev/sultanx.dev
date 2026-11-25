@@ -20,7 +20,23 @@ export const mySkills = [
   <Prisma key="prisma" />,
 ];
 
+export const aboutSkills = [
+  { name: 'React', icon: <ReactIcon /> },
+  { name: 'Next.js', icon: <NextJs /> },
+  { name: 'TypeScript', icon: <TypeScript /> },
+  { name: 'JavaScript', icon: <JavaScript /> },
+  { name: 'Node.js', icon: <NodeJs /> },
+  { name: 'PostgreSQL', icon: <PostgreSQL /> },
+  { name: 'MongoDB', icon: <MongoDB /> },
+  { name: 'Prisma', icon: <Prisma /> },
+];
+
 export const about = {
   name: 'Sultan Alam',
-  description: `I'm Full Stack Developer focused on building scalable, production-ready web applications. I specialize in developing MVPs quickly while maintaining clean architecture and strong UI quality. with a strong interest in performance-driven web systems.`,
+  role: 'Co-Founder & Full-Stack Engineer',
+  status: 'Building Parsona',
+  websiteLabel: 'parsona.live',
+  websiteHref: 'https://parsona.live',
+  description:
+    "I'm a Full-Stack & AI Engineer focused on taking 0→1 products from architecture to production. Currently co-building Parsona that unifies multi-channel customer conversations, shared context, and AI workflows with reliable backend systems and clean UI.",
 };

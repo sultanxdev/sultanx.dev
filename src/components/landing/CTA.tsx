@@ -3,7 +3,6 @@
 import { ctaConfig } from '@/config/CTA';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 import Cal, { getCalApi } from '@calcom/embed-react';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import Container from '../common/Container';
@@ -24,8 +23,6 @@ interface CallToActionProps {
 }
 
 export default function CTA({
-  profileImage = ctaConfig.profileImage,
-  profileAlt = ctaConfig.profileAlt,
   linkText = ctaConfig.linkText,
   calLink = ctaConfig.calLink,
   preText = ctaConfig.preText,
@@ -74,13 +71,6 @@ export default function CTA({
           />
 
           <div className="relative flex flex-col items-center gap-8 sm:flex-row">
-            <Image
-              src={profileImage}
-              alt={profileAlt}
-              width={80}
-              height={80}
-              className="shrink-0 rounded-2xl bg-blue-300 ring-2 ring-border/50 shadow-md dark:bg-yellow-300"
-            />
             <div className="flex-1 text-center sm:text-left">
               <p className="text-foreground mb-2 text-lg font-semibold text-balance sm:text-xl">
                 {preText}
