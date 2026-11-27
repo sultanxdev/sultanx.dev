@@ -1,6 +1,6 @@
 # Sleek Portfolio by sultanx.dev
 
-A modern, responsive portfolio website built with Next.js 15, TypeScript, Tailwind CSS, and Shadcn UI. Features a blog system, project showcase, work experience timeline, and contact form with Telegram integration.
+A modern, responsive portfolio website built with Next.js 15, TypeScript, Tailwind CSS, and Shadcn UI. Features a blog system, project showcase, work experience timeline, and contact form.
 
 ![Portfolio Preview](/public/meta/opengraph-image.png)
 
